@@ -1,11 +1,42 @@
 import React, { useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 const Prescription = () => {
   const [prescriptions, setPrescriptions] = useState([]);
 
-  const handleUpload = () => {
-    Alert.alert('Upload functionality is not implemented yet.');
+  const handleUpload = async () => {
+    // Request permission to access media library
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert('Permission Denied', 'Permission to access media library is required!');
+      return;
+    }
+
+    // Launch image picker
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.cancelled) {
+      const newPrescription = {
+        id: Date.now().toString(),
+        name: `Prescription ${prescriptions.length + 1}`,
+        uri: pickerResult.uri,
+      };
+      setPrescriptions([...prescriptions, newPrescription]);
+    }
   };
 
   const handleSelect = (uri) => {
@@ -14,8 +45,12 @@ const Prescription = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
+      <Image source={{ uri: item.uri }} style={styles.image} />
       <Text style={styles.cardTitle}>{item.name}</Text>
-      <TouchableOpacity style={styles.selectButton} onPress={() => handleSelect(item.uri)}>
+      <TouchableOpacity
+        style={styles.selectButton}
+        onPress={() => handleSelect(item.uri)}
+      >
         <Text style={styles.buttonText}>Select</Text>
       </TouchableOpacity>
     </View>
@@ -28,14 +63,16 @@ const Prescription = () => {
         data={prescriptions}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Text>No prescriptions uploaded.</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No prescriptions uploaded.</Text>
+        }
+        contentContainerStyle={
+          prescriptions.length === 0 && styles.emptyContainer
+        }
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
           <Text style={styles.buttonText}>Upload</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.selectButton} onPress={handleSelect}>
-          <Text style={styles.buttonText}>Select</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -60,14 +97,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+    alignItems: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginBottom: 10,
+    borderRadius: 8,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
+    marginBottom: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 20,
   },
   uploadButton: {
@@ -76,21 +119,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     alignItems: 'center',
-    flex: 1,
-    marginRight: 10,
   },
   selectButton: {
     backgroundColor: '#28a745',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
-    flex: 1,
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
   },
 });
 

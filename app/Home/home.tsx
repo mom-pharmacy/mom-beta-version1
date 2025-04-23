@@ -9,6 +9,7 @@ import {
     StyleSheet,
     TextInput,
     ScrollView,
+    TouchableOpacity,
 
 } from 'react-native';
 
@@ -19,8 +20,11 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 import Categories from './categories';
 import useLocation from '@/hooks/useLocation';
+import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
 
 export default function Home() {
@@ -52,10 +56,12 @@ export default function Home() {
 
     const handleScroll = (event) => {
         const scrollY = event.nativeEvent.contentOffset.y;
-        setShowHeader(scrollY < 50); // Hide header when scrolled more than 50px
+        setShowHeader(scrollY < 50);
     };
 
-
+    const handleLocation = () => {
+        router.replace('../Profile/myaddress')
+    }
 
     return (
         <>
@@ -65,17 +71,19 @@ export default function Home() {
 
                     <View style={styles.leftSection}>
                         <Text style={styles.head}>10 minutes</Text>
-                        <View style={styles.row}>
-                            <FontAwesome6 name="location-dot" size={24} color="white" />
-                            <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                                {locationName || "Fetching location..."}
-                            </Text>
-                        </View>
+                        <TouchableOpacity onPress={handleLocation} >
+                            <View style={styles.row}>
+                                <FontAwesome6 name="location-dot" size={24} color="white" />
+                                <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
+                                    {locationName || "Fetching location..."} <Entypo style={{ marginTop: 10 }} name="chevron-down" size={24} color="white" />
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
 
                     <View style={styles.cartContainer} >
-                        <FontAwesome6 name="user-large" size={24} color="white" onPress={()=>router.replace('../myProfile')} />
+                        <FontAwesome6 name="user-large" size={24} color="white" onPress={() => router.replace('../myProfile')} />
                     </View>
                 </View>
 
@@ -162,11 +170,35 @@ export default function Home() {
                                 <Text style={styles.label}>Call</Text>
                             </View>
                         </TouchableHighlight>
+
                     </View>
+
+
                     <View style={styles.popular2} >
+                        <View style={styles.blood}>
+                            <Image
+                                source={require('../../assets/images/blood.gif')}
+                                style={{ width: 55, margin: 10, height: 40 }}
+
+                            />
+                            <Text style={{fontWeight:'bold',fontSize:20,margin:15,alignItems:'center'}}>Blood Bank</Text>
+                            <TouchableHighlight onPress={() => { router.replace('../BloodFinder/registration') }} style={{marginLeft:80,height:45,width:60,backgroundColor:'red',borderRadius:10,padding:10,alignItems:'center',margin:10}}>
+                                <AntDesign name="arrowright" size={24} color="white" />
+                            </TouchableHighlight>
+                        </View>
                         <View style={styles.popular}>
                             <Text style={styles.pop}>Popular Medicines</Text>
                             <Categories showSearch={false} />
+                        </View>
+                        <View>
+                            <Text style={{textAlign:'center',color:'gray',marginBottom:40}}>PROD - v 1.0.1(2)</Text>
+                            <Text style={{fontSize:30,fontWeight:'bold',textAlign:'center',color:'gray'}}>Live</Text>
+                            <Text style={{fontSize:30,fontWeight:'bold',textAlign:'center',marginBottom:20,color:'gray'}}>Healthy</Text>
+                            <Text style={{fontSize:14,fontWeight:'bold',textAlign:'center',marginBottom:40,color:'gray'}}>Crafted with  <AntDesign name="heart" size={24} color="red" />  in India </Text>
+                            <Text style={{fontSize:14,fontWeight:'bold',textAlign:'center',marginBottom:20,color:'gray'}}>Powered by </Text>
+                            
+                     
+                        
                         </View>
                     </View>
                 </ScrollView>
@@ -181,7 +213,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#00a99d'
     },
     container: {
-        padding: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
         flexDirection: 'row',
         gap: 10,
         backgroundColor: '#b2e0dc'
@@ -213,9 +246,9 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         color: '#333',
+        fontWeight: 'bold'
     },
     location: {
-
         width: 20,
         height: 20,
         marginRight: 8,
@@ -311,14 +344,14 @@ const styles = StyleSheet.create({
 
     },
     doctor: {
-        flexDirection: 'row',       // Align items in a row
-        justifyContent: 'space-around', // Space between items
-        alignItems: 'center',       // Align items vertically
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
         padding: 10,
-        // Optional: background color
+
     },
     each: {
-        flex: 1,                    // Take equal space
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -340,10 +373,25 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingBottom: 100,
-        marginTop: 10, // So content won't overlap search bar
+        marginTop: 10,
     },
 
+    blood: {
+        height: 65,
+        marginHorizontal: 12,
+        marginTop: 15,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#F0F0F0',
+        elevation: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        flexDirection: 'row'
 
+    }
 
 
 });

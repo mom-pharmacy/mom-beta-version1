@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { BlurView } from 'expo-blur';
@@ -5,11 +6,11 @@ import { BlurView } from 'expo-blur';
 export default function About() {
   return (
     <ImageBackground
-    source={require('../../assets/images/img1.jpeg')}
+   source={require('../../assets/images/img1.jpeg')}
     style={styles.background}
     resizeMode="cover"
   >  
-      <BlurView intensity={80} tint="light" style={styles.blurBox}>
+      <BlurView intensity={80} tint="light" style={{height:300,marginTop:50,width:'80%'}}>
         <Text style={styles.title}>About Us</Text>
         <Text style={styles.content}>
           
@@ -29,13 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  blurBox: {
-    width: '90%',
-    padding: 25,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    alignItems: 'center',
-  },
+
   title: {
     fontFamily: "DM Sans",
     fontSize: 28,
@@ -52,8 +47,3 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 });
-
-
-
-
-

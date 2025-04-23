@@ -1,208 +1,101 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
-  ImageBackground,
-  StyleSheet,
+  View,
   Text,
   TextInput,
-  View,
   Button,
-  Alert,
-  Pressable,
+  StyleSheet,
+  Modal,
 } from 'react-native';
-import { Checkbox, Provider as PaperProvider } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
-import {
-  SafeAreaView,
-  SafeAreaProvider,
-} from 'react-native-safe-area-context';
-import { Rating } from '@kolking/react-native-rating'; // This works in Expo if installed via npm
+import { useNavigation } from '@react-navigation/native';
 
-const App = () => {
-  const [review1, setReview] = useState('');
-  const [review2, setReview1] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+const SuggestProduct = () => {
+  const [suggestion, setSuggestion] = useState('');
+  const [modalVisible, setModalVisible] = useState(true);
+  const navigation = useNavigation(); 
 
-  const [technical, setTechnical] = useState(false);
-  const [nonTechnical, setNonTechnical] = useState(false);
-  const [needMedicine, setNeedMedicine] = useState(false);
+  const handleSend = () => {
+    console.log(suggestion);
 
-  const [rating, setRating] = useState(0);
-
-  const handleChange = useCallback(
-    (value) => setRating(value),
-    []
-  );
-
-  const handleSubmit = () => {
-    if (review1.trim() === '' || review2.trim() === '') {
-      Alert.alert('Please fill in both fields before submitting.');
-      return;
-    }
-
-    setSubmitted(true);
-    Alert.alert('Submitted');
+    setSuggestion('');
+    setModalVisible(false);
+    navigation.navigate('index'); 
   };
 
   return (
-    <PaperProvider>
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container} edges={['left', 'right']}>
-          <ImageBackground
-            source={require('../../assets/images/img1.jpeg')}
-            style={styles.image}
-          >
-            <View style={styles.content}>
-              <Text style={styles.title}>Any suggestions</Text>
+    <Modal visible={modalVisible} transparent animationType="fade">
+      <View style={styles.overlay}>
+        <View style={styles.modalBox}>
+          <View style={[styles.closeButtonContainer, { opacity: 0.5 }]}>
+            <Button title="✕" onPress={() => navigation.navigate('index.jsx')} />
+          </View>
 
-              <View style={styles.checkboxContainer}>
-                <View style={styles.checkboxRow}>
-                  <Checkbox
-                    status={technical ? 'checked' : 'unchecked'}
-                    onPress={() => setTechnical(!technical)}
-                    color="#fff"
-                  />
-                  <Text style={styles.checkboxLabel}>Technical</Text>
-                </View>
-                <View style={styles.checkboxRow}>
-                  <Checkbox
-                    status={nonTechnical ? 'checked' : 'unchecked'}
-                    onPress={() => setNonTechnical(!nonTechnical)}
-                    color="#fff"
-                  />
-                  <Text style={styles.checkboxLabel}>Non-Technical</Text>
-                </View>
-                <View style={styles.checkboxRow}>
-                  <Checkbox
-                    status={needMedicine ? 'checked' : 'unchecked'}
-                    onPress={() => setNeedMedicine(!needMedicine)}
-                    color="#fff"
-                  />
-                  <Text style={styles.checkboxLabel}>Need Medicine</Text>
-                </View>
-              </View>
+          <Text style={styles.title}>Suggest Products</Text>
+          <Text style={styles.subtitle}>
+            Didn’t find what you are looking for? Please suggest the products
+          </Text>
 
-              <TextInput
-                style={styles.reviewBox1}
-                placeholder="Suggestions"
-                placeholderTextColor="#000"
-                multiline
-                numberOfLines={4}
-                value={review1}
-                onChangeText={setReview}
-              />
-              <TextInput
-                style={styles.reviewBox2}
-                placeholder="Write your review here..."
-                placeholderTextColor="#000"
-                multiline
-                numberOfLines={4}
-                value={review2}
-                onChangeText={setReview1}
-              />
-              <View style={{ marginBottom: 20 }}>
-               <Rating size={30} rating={rating} onChange={handleChange} />
-              </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter the name of the products you would like to see."
+            placeholderTextColor="#999"
+            multiline
+            numberOfLines={4}
+            value={suggestion}
+            onChangeText={setSuggestion}
+          />
 
-              <Pressable
-  onPress={handleSubmit}
-  disabled={submitted}
-  style={({ pressed }) => [
-    styles.button,
-    submitted && styles.buttonDisabled,
-    pressed && !submitted && styles.buttonPressed,
-  ]}
->
-  <Text style={styles.buttonText}>
-    {submitted ? 'Submitted' : 'Submit'}
-  </Text>
-</Pressable>
-            </View>
-          </ImageBackground>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </PaperProvider>
+          <Button title="Send" onPress={handleSend} color="#00A99D" />
+        </View>
+      </View>
+    </Modal>
   );
 };
 
+export default SuggestProduct;
+
 const styles = StyleSheet.create({
-  container: {
+  overlay: {
     flex: 1,
-  },
-  image: {
-    flex: 1,
+    backgroundColor: '#00000040',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  content: {
-    justifyContent: 'center',
+  modalBox: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
+    elevation: 10,
+  },
+  closeButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
-    backgroundColor: '#00000070',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  checkboxContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: '#fff',
-    marginLeft: 8,
-  },
-  reviewBox1: {
-    backgroundColor: '#ffffffcc',
-    color: '#000',
-    padding: 20,
-    margin: 15,
-    width: 300,
-    borderRadius: 8,
-    fontSize: 16,
-    textAlignVertical: 'top',
-  },
-  reviewBox2: {
-    backgroundColor: '#ffffffcc',
-    color: '#000',
-    padding: 20,
-    margin: 15,
-    width: 300,
-    borderRadius: 8,
-    fontSize: 16,
-    textAlignVertical: 'top',
-  },
-  button: {
-    backgroundColor: '#00A99D',
-    /*gradientBegin:"#874f00",
-          gradientEnd:"#f5ba57",
-          gradientDirection:"diagonal",*/ 
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  buttonPressed: {
-    backgroundColor: '#0056b3',
-  },
-  buttonDisabled: {
-    backgroundColor: '#999',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#1A1A1A',
+    marginBottom: 10,
     textAlign: 'center',
   },
+  subtitle: {
+    fontSize: 14,
+    color: '#4B4B4B',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  input: {
+    backgroundColor: '#F8F8F8',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 14,
+    color: '#000',
+    width: '100%',
+    textAlignVertical: 'top',
+    marginBottom: 20,
+  },
 });
-
-export default App;

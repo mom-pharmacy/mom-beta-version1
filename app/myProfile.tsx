@@ -82,7 +82,7 @@ const profileItems = [
     name: 'Logout',
     mainIcon: <Ionicons name="log-out-outline" size={24} color="#00a99d" />,
     icon: <Ionicons name="arrow-forward" size={20} color="#ccc" />,
-    link: '/Profile/',
+    link: '/Profile/Login',
   },
 ];
 

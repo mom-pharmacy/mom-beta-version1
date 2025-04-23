@@ -14,122 +14,108 @@ import {
 import { useCart } from "../cartContext";
 import { router } from "expo-router";
 
-const { width } = Dimensions.get("window");
 
 const medicines = [
-  [
-    {
-      id: '1',
-      name: "Dolo 650 Tablet",
-      sub: "Strip of 15 tab",
-      price: "₹28.53",
-      original: "₹50",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '2',
-      name: "Ayu",
-      sub: "Strip of 15 tab",
-      price: "₹28.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '3',
-      name: "Diabetics",
-      sub: "Strip of 15 tab",
-      price: "₹28.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-  ],
-  [
-    {
-      id: '4',
-      name: "Dolo 650",
-      sub: "Strip of 15 tab",
-      price: "₹28.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '5',
-      name: "Ayu",
-      sub: "Strip of 15 tab",
-      price: "₹39.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '6',
-      name: "Diabetics",
-      sub: "Strip of 15 tab",
-      price: "₹51.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-  ],
-  [
-    {
-      id: '7',
-      name: "Dolo 650",
-      sub: "Strip of 15 tab",
-      price: "₹48.00",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '8',
-      name: "Ayu",
-      sub: "Strip of 15 tab",
-      price: "₹73.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '9',
-      name: "Diabetics",
-      sub: "Strip of 15 tab",
-      price: "₹48.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-  ],
-  [
-    {
-      id: '10',
-      name: "Dolo 650",
-      sub: "Strip of 15 tab",
-      price: "₹48.00",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '11',
-      name: "Ayu",
-      sub: "Strip of 15 tab",
-      price: "₹73.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-    {
-      id: '12',
-      name: "Diabetics",
-      sub: "Strip of 15 tab",
-      price: "₹48.53",
-      image: require("../../assets/images/medicine.png"),
-    },
-  ],
+
+  {
+    id: '1',
+    name: "Dolo 650 Tablet",
+    sub: "Strip of 15 tab",
+    price: 28.53,
+
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '2',
+    name: "Ayu",
+    sub: "Strip of 15 tab",
+    price: 28.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '3',
+    name: "Diabetics",
+    sub: "Strip of 15 tab",
+    price: 28.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+
+  {
+    id: '4',
+    name: "Dolo 650",
+    sub: "Strip of 15 tab",
+    price: 28.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '5',
+    name: "Ayu",
+    sub: "Strip of 15 tab",
+    price: 39.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '6',
+    name: "Diabetics",
+    sub: "Strip of 15 tab",
+    price: 51.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+
+  {
+    id: '7',
+    name: "Dolo 650",
+    sub: "Strip of 15 tab",
+    price: 48.00,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '8',
+    name: "Ayu",
+    sub: "Strip of 15 tab",
+    price: 73.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '9',
+    name: "Diabetics",
+    sub: "Strip of 15 tab",
+    price: 48.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+
+  {
+    id: '10',
+    name: "Dolo 650",
+    sub: "Strip of 15 tab",
+    price: 48.00,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '11',
+    name: "Ayu",
+    sub: "Strip of 15 tab",
+    price: 73.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+  {
+    id: '12',
+    name: "Diabetics",
+    sub: "Strip of 15 tab",
+    price: 48.53,
+    image: require("../../assets/images/medicine.png"),
+  },
+
 ];
 
 export default function Categories({ showSearch = true }) {
-  const [cart, setCart] = useState({});
-  const [showCartBar, setShowCartBar] = useState(false);
-  const slideAnim = useState(new Animated.Value(100))[0];
-  const { cart1, addToCart, incrementItem, decrementItem, removeFromCart, clearCart } = useCart();
+  const { cartItems, addToCart, removeFromCart, incrementItem, decrementItem } = useCart()
 
-
-
-  const toggleCartBar = (visible: boolean | ((prevState: boolean) => boolean)) => {
-    Animated.timing(slideAnim, {
-      toValue: visible ? 0 : 100,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => setShowCartBar(visible));
-  };
-
-  const totalItems = Object.values(cart1).reduce((a, b) => a + b, 0);
-
+  const quantity = (itemId) => {
+    const findItem = cartItems.find(item => item.id === itemId)
+    console.log(findItem)
+    return findItem.quantity
+  }
   return (
     <>
       <ScrollView style={{ marginBottom: 80, backgroundColor: 'white' }}>
@@ -140,93 +126,87 @@ export default function Categories({ showSearch = true }) {
             <TextInput placeholder="search medicines" />
           </View>
         )}
+        
+       <View style={styles.cardContainer}>
+        {medicines.map((item) => (
+          <View style={styles.container} key={item.id}>
 
-        {medicines.map((row, rowIndex) => (
-          <View style={styles.container} key={rowIndex}>
-            {row.map((item, index) => {
-              const itemKey = `${rowIndex}-${index}`;
-              console.log(itemKey)
-              const count = cart1[itemKey] || 0;
+            <TouchableOpacity
+              style={styles.card1}
+              onPress={() => router.push({
+                pathname: '/Open',
+                params: {
+                  id: item.id,
+                  name: item.name,
+                  sub: item.sub,
+                  price: item.price,
+                  image: item.image,
+                },
+              })}
+            >
+              <View style={styles.card1}>
+                <View style={styles.card}>
+                  <View style={styles.imageContainer}>
+                    <Image style={styles.image} source={item.image} />
 
-              return (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.card1}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/Open",
-                      params: {
-                        item: JSON.stringify(item),
-                      },
-                    })
-                  }
-                >
-                <View style={styles.card1} key={index}>
-                  <View style={styles.card}>
-                    <View style={styles.imageContainer}>
-                      <Image style={styles.image} source={item.image} />
-
-                      {count === 0 ? (
+                    {!cartItems.some((itemcart) => item.id === itemcart.id) ? (
+                      <TouchableOpacity
+                        onPress={() => addToCart(item)}
+                        style={styles.overlayAddBtn}
+                      >
+                        <Text style={styles.addButtonText}>+</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={styles.overlayCounter}>
                         <TouchableOpacity
-                          onPress={() => addToCart(itemKey)}
-                          style={styles.overlayAddBtn}
+                          onPress={() =>
+                            quantity(item.id) > 1
+                              ? decrementItem(item.id)
+                              : removeFromCart(item.id)
+                          }
                         >
-                          <Text style={styles.addButtonText}>+</Text>
+                          <Text style={styles.counterBtn}>−</Text>
                         </TouchableOpacity>
-                      ) : (
-                        <View style={styles.overlayCounter}>
-                          <TouchableOpacity onPress={() => decrementItem(itemKey)}>
-                            <Text style={styles.counterBtn}>−</Text>
-                          </TouchableOpacity>
-                          <Text style={styles.counterText}>{count}</Text>
-                          <TouchableOpacity onPress={() => incrementItem(itemKey)}>
-                            <Text style={styles.counterBtn}>+</Text>
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.sub}>{item.sub}</Text>
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>{item.price}</Text>
-                    {item.original && (
-                      <Text style={styles.originalPrice}>{item.original}</Text>
+                        <Text style={styles.counterText}>{quantity(item.id)}</Text>
+                        <TouchableOpacity onPress={() => incrementItem(item.id)}>
+                          <Text style={styles.counterBtn}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
-                  
                 </View>
-                </TouchableOpacity>
-              );
-            })}
+
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.sub}>{item.sub}</Text>
+                <View style={styles.priceRow}>
+                  <Text style={styles.price}>{item.price}</Text>
+
+                </View>
+              </View>
+            </TouchableOpacity>
+
           </View>
         ))}
+        </View>
+
       </ScrollView>
 
-      <Animated.View
-        style={[
-          styles.cartBar,
-          {
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        <Text style={styles.cartBarText}>{totalItems} items in cart</Text>
-        <TouchableOpacity style={styles.viewCartBtn}>
-          <Text style={styles.viewCartText}>View Cart</Text>
-        </TouchableOpacity>
-      </Animated.View>
+
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  cardContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     paddingHorizontal: 10,
-    paddingVertical: 15,
+    marginTop:20
+  },
+  container: {
+    width: "30%", 
+    marginBottom: 15,
 
   },
   card: {

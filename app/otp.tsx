@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { verifyOtp } from '../lib/otp';
+import { sendSmsOtp, verifyOtp } from '../lib/otp';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OtpScreen() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -41,22 +42,24 @@ export default function OtpScreen() {
     }
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     const fullOtp = otp.join('');
-    if (verifyOtp(fullOtp)) {
-    
-      router.replace('./Home/home')
-    } else {
-      Alert.alert('Invalid OTP');
-    }
+    const isValid = await verifyOtp(fullOtp);
+if (isValid) {
+  router.replace('./Home/home');
+} else {
+  Alert.alert('Invalid OTP');
+}
+
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     if (canResend) {
       setOtp(['', '', '', '', '', '']);
       setTimer(30);
       setCanResend(false);
-      Alert.alert('OTP Resent');
+      await sendSmsOtp(typeof user === 'string' ? user : user[0]);
+      Alert.alert('OTP Resend','A new Otp has been sent to your phone');
     }
   };
 
