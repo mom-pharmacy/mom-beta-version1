@@ -21,6 +21,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import Categories from './categories';
 import useLocation from '@/hooks/useLocation';
@@ -121,6 +122,17 @@ export default function Home() {
                             <FontAwesome5 name="hospital" size={25} color="white" />
                             <Text style={styles.iconText}>Hospitals</Text>
                         </View>
+                        <View style={styles.each}>
+                            <TouchableHighlight onPress={() => router.push('../BloodFinder/myProfile')}>
+                                <View>
+                                    <MaterialCommunityIcons name="blood-bag" size={25} color="white" />
+                                    <Text style={styles.iconText}>Bloodbank</Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+
+
+
                     </View>
 
 
@@ -175,30 +187,20 @@ export default function Home() {
 
 
                     <View style={styles.popular2} >
-                        <View style={styles.blood}>
-                            <Image
-                                source={require('../../assets/images/blood.gif')}
-                                style={{ width: 55, margin: 10, height: 40 }}
-
-                            />
-                            <Text style={{fontWeight:'bold',fontSize:20,margin:15,alignItems:'center'}}>Blood Bank</Text>
-                            <TouchableHighlight onPress={() => { router.replace('../BloodFinder/registration') }} style={{marginLeft:80,height:45,width:60,backgroundColor:'red',borderRadius:10,padding:10,alignItems:'center',margin:10}}>
-                                <AntDesign name="arrowright" size={24} color="white" />
-                            </TouchableHighlight>
-                        </View>
+                  
                         <View style={styles.popular}>
                             <Text style={styles.pop}>Popular Medicines</Text>
                             <Categories showSearch={false} />
                         </View>
                         <View>
-                            <Text style={{textAlign:'center',color:'gray',marginBottom:40}}>PROD - v 1.0.1(2)</Text>
-                            <Text style={{fontSize:30,fontWeight:'bold',textAlign:'center',color:'gray'}}>Live</Text>
-                            <Text style={{fontSize:30,fontWeight:'bold',textAlign:'center',marginBottom:20,color:'gray'}}>Healthy</Text>
-                            <Text style={{fontSize:14,fontWeight:'bold',textAlign:'center',marginBottom:40,color:'gray'}}>Crafted with  <AntDesign name="heart" size={24} color="red" />  in India </Text>
-                            <Text style={{fontSize:14,fontWeight:'bold',textAlign:'center',marginBottom:20,color:'gray'}}>Powered by </Text>
-                            
-                     
-                        
+                            <Text style={{ textAlign: 'center', color: 'gray', marginBottom: 40 }}>PROD - v 1.0.1(2)</Text>
+                            <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center', color: 'gray' }}>Live</Text>
+                            <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, color: 'gray' }}>Healthy</Text>
+                            <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginBottom: 40, color: 'gray' }}>Crafted with  <AntDesign name="heart" size={24} color="red" />  in India </Text>
+                            <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, color: 'gray' }}>Powered by </Text>
+
+
+
                         </View>
                     </View>
                 </ScrollView>
@@ -357,11 +359,11 @@ const styles = StyleSheet.create({
     },
     iconText: {
         marginTop: 5,
-        fontSize: 14,
+        fontSize: 12,
         color: '#fff',
     },
     activeTab: {
-        borderBottomWidth: 4,
+        borderBottomWidth: 3,
         borderBottomColor: '#fff',
         paddingBottom: 5,
         marginBottom: -10,

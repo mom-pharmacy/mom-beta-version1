@@ -1,212 +1,354 @@
-import { EvilIcons, Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    FlatList,
+    Modal,
+    TextInput,
+    Button,
+    router,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
 
+const donors = [
+    {
+        id: '1',
+        name: 'Lanka Srinivas',
+        phone: '6715116151',
+        bloodGroup: 'AB+',
+        available: true,
+        state: 'Andhra Pradesh',
+        city: 'Vijayawada',
+    },
+    {
+        id: '2',
+        name: 'Yash',
+        phone: '7897254067',
+        bloodGroup: 'B+',
+        available: false,
+        state: 'Karnataka',
+        city: 'Bangalore',
+    },
+    {
+        id: '3',
+        name: 'Nikshitha',
+        phone: '8777002889',
+        bloodGroup: 'A+',
+        available: true,
+        state: 'Telangana',
+        city: 'Hyderabad',
+    },
+];
 
-const donarDetails = [
-    {
-        name: "John Doe",
-        age: 30,
-        bloodGroup: "A+",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-    {
-        name: "Harry Potter",
-        age: 30,
-        bloodGroup: "AB+",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-    {
-        name: "Albus Dumbledore",
-        age: 30,
-        bloodGroup: "B+",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-    {
-        name: "Emma Watson",
-        age: 30,
-        bloodGroup: "AB+",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-    {
-        name: "Fred Weasley",
-        age: 30,
-        bloodGroup: "B-",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-    {
-        name: "Katniss Everdeen",
-        age: 30,
-        bloodGroup: "AB",
-        area: "Downtown",
-        contact: 97887833432,
-        state: "Andhra Pradesh",
-        city: "Hyderabad",
-        country: "India",
-    },
-]
+const States = [['Telangana']];
+const Cities = [['Vijayawada', 'Bangalore', 'Hyderabad']];
 
-const States = [["Andhra Pradesh", "Telangana", "Tamil Nadu", "Karnataka", "Kerala", "Maharashtra", "Gujarat", "Rajasthan", "Uttar Pradesh", "Bihar"]]
-const Cities = [["Hyderabad", "Vijayawada", "Visakhapatnam", "Tirupati", "Warangal", "Guntur", "Nellore", "Kakinada", "Rajahmundry", "Anantapur"]]
+export const FilterComponent = ({ bloodGroup, setBloodGroup, state, setState, city, setCity, setShowFilter }) => (
+    <View >
+        <Text style={{ fontWeight: "bold", textAlign: "center", fontSize: 24, marginTop: 20 }}>
+            Select the Details
+        </Text>
 
-function BloodDonarDetails() {
+        <View>
+            
+            <View style={styles.pickerContainer} >
+                <Picker selectedValue={bloodGroup} onValueChange={setBloodGroup}>
+                    <Picker.Item label="Select Blood Group" value="" />
+                    <Picker.Item label="A+" value="A+" />
+                    <Picker.Item label="A-" value="A-" />
+                    <Picker.Item label="B+" value="B+" />
+                    <Picker.Item label="B-" value="B-" />
+                    <Picker.Item label="O+" value="O+" />
+                    <Picker.Item label="O-" value="O-" />
+                    <Picker.Item label="AB+" value="AB+" />
+                    <Picker.Item label="AB-" value="AB-" />
+                </Picker>
+            </View>
+        </View>
 
-    const [DonarDetailsData, setDonorDetailsData] = useState(donarDetails);
-    const [state, setState] = useState("Andhra Pradesh");
-    const [city, setCity] = useState("Hyderabad");
-    const [bloodGroup, setBloodGroup] = useState("B+");
-    const [area, setArea] = useState("Downtown");
+        <View>
+            
+            <View style={styles.pickerContainer}>
+                <Picker selectedValue={state} onValueChange={setState}>
+                    <Picker.Item label="Select state" value="" />
+                    {States[0].map((s) => (
+                        <Picker.Item label={s} value={s} key={s} />
+                    ))}
+                </Picker>
+            </View>
+        </View>
 
+        <View>
+      
+            <View style={styles.pickerContainer}>
+                <Picker selectedValue={city} onValueChange={setCity}>
+                    <Picker.Item label="Select city" value="" />
+                    {Cities[0].map((c) => (
+                        <Picker.Item label={c} value={c} key={c} />
+                    ))}
+                </Picker>
+            </View>
+        </View>
+
+        <TouchableOpacity onPress={() => setShowFilter(false)} style={styles.applyBtn}>
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 20 }}>Search</Text>
+        </TouchableOpacity>
+    </View>
+);
+
+
+
+
+
+const AvailableDonorsScreen = () => {
     const [showFilter, setShowFilter] = useState(false);
+    const [bloodGroup, setBloodGroup] = useState('');
+    const [state, setState] = useState('');
+    const [city, setCity] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [suggestion, setSuggestion] = useState('');
+    const [customReason, setCustomReason] = useState('');
 
+    const handleSend = () => {
+        const finalReport = suggestion === 'Other' ? customReason : suggestion;
+        console.log('Report:', finalReport);
+        setSuggestion('');
+        setCustomReason('');
+        setShowModal(false);
+    };
 
-    useEffect(() => {
-        const filteredData = donarDetails.filter((donar) => {
-            return (
-                (state ? donar.state === state : true) &&
-                (city ? donar.city === city : true) &&
-                (bloodGroup ? donar.bloodGroup === bloodGroup : true)
-            );
-        }
+    const filteredDonors = donors.filter((donor) => {
+        return (
+            (bloodGroup ? donor.bloodGroup === bloodGroup : true) &&
+            (state ? donor.state === state : true) &&
+            (city ? donor.city === city : true)
         );
-        setDonorDetailsData(filteredData);
-    }, [state, city, bloodGroup, area]);
+    });
 
-    const FilterComponent = () => {
-        return <View>
-            <Text style={{ fontWeight: "bold", textAlign: "center", fontSize: 24, marginTop: 20 }}>Select the Details</Text>
-            <View>
-                <Text style={{ marginHorizontal: 20, fontWeight: "bold", fontSize: 22, marginTop: 20 }}>Blood Group</Text>
-                <View style={{ borderWidth: 1, borderRadius: 10, margin: 10, padding: 1 }}>
-                    <Picker
-                        selectedValue={bloodGroup}
-                        onValueChange={(itemValue) => setBloodGroup(itemValue)}
-                    >
-                        <Picker.Item label="Select Blood Group" value="" />
-                        <Picker.Item label="A+" value="A+" />
-                        <Picker.Item label="A-" value="A-" />
-                        <Picker.Item label="B+" value="B+" />
-                        <Picker.Item label="B-" value="B-" />
-                        <Picker.Item label="O+" value="O+" />
-                        <Picker.Item label="O-" value="O-" />
-                        <Picker.Item label="AB+" value="AB+" />
-                        <Picker.Item label="AB-" value="AB-" />
-                    </Picker>
-                </View>
+    const DonorCard = ({ donor }) => (
+        <View style={styles.card}>
+            <View style={styles.info}>
+                <Text style={styles.name}>{donor.name}</Text>
+                <Text style={styles.phone}>{donor.phone}</Text>
+                <Text style={styles.blood}>Blood Group: {donor.bloodGroup}</Text>
+                <Text style={[styles.status, { color: donor.available ? 'green' : 'red' }]}>
+                    {donor.available ? 'Available' : 'Not Available'}
+                </Text>
             </View>
-
-            <View>
-                <Text style={{ marginHorizontal: 20, fontWeight: "bold", fontSize: 22, marginTop: 20 }}>States</Text>
-                <View style={{ borderWidth: 1, borderRadius: 10, margin: 10, padding: 1 }}>
-                    <Picker
-                        selectedValue={state}
-                        onValueChange={(itemValue) => setState(itemValue)}
-                    >
-                        <Picker.Item label="Select state" value="" />
-                        {States[0].map((state) => {
-                            return <Picker.Item label={state} value={state} key={state} />
-                        })}
-
-                    </Picker>
-                </View>
-            </View>
-
-            <View>
-                <Text style={{ marginHorizontal: 20, fontWeight: "bold", fontSize: 22, marginTop: 20 }}>Cities</Text>
-                <View style={{ borderWidth: 1, borderRadius: 10, margin: 10, padding: 1 }}>
-                    <Picker
-                        selectedValue={city}
-                        onValueChange={(itemValue) => setCity(itemValue)}
-                    >
-                        <Picker.Item label="Select city" value="" />
-                        {Cities[0].map((state) => {
-                            return <Picker.Item label={state} value={state} key={state} />
-                        })}
-
-                    </Picker>
-                </View>
-            </View>
-            <View >
-                <TouchableOpacity onPress={() => { setShowFilter(false) }} style={{ backgroundColor: "red", padding: 10, borderRadius: 10, margin: 20 }}>
-                    <Text style={{ color: "white", textAlign: "center", fontSize: 20 }}>Apply Filter</Text>
+            <View style={styles.actions}>
+                <TouchableOpacity style={styles.reportBtn} onPress={() => setShowModal(true)}>
+                    <Text style={styles.btnText}>Report</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.callBtn}>
+                    <Ionicons name="call" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
         </View>
-    }
-
-
-    const DonorDetailsComponents = () => {
-        return <View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin: 10 }}>
-            <Text style={{ fontWeight: "bold", margin: 10, fontSize: 24 }}>Donor Details</Text>
-            <TouchableOpacity onPress={() => { setShowFilter(true) }} style={{ backgroundColor: "red", padding: 10, borderRadius: 10, margin: 20 }}>
-                <Text style={{ color: "white", textAlign: "center", fontSize: 20 }}>Filter</Text>
-            </TouchableOpacity>
-            </View>
-            <FlatList data={DonarDetailsData} renderItem={({ item }) => {
-                return <View key={item.name} style={{ flexDirection: "row", justifyContent: "flex-start", alignItems: "center", padding: 20, margin: 5, flex: 1, backgroundColor: "white", elevation: 2 }}>
-                    <View style={{ borderWidth: 1, borderRadius: 50, width: 60, height: 60, justifyContent: "center", alignItems: "center", backgroundColor: "red", marginRight: 12 }}>
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 20, textAlign: "center" }}> {item.bloodGroup}</Text>
-                    </View>
-                    <View>
-                        <Text style={styles.donorDetails}>Name: {item.name}</Text>
-                        <Text>Age: {item.age}</Text>
-                        <Text>Phone:{item.contact}</Text>
-                        <View>
-                            <Text style={{color:"gray" , fontSize:12 , marginVertical:5}}><Ionicons name="location" /> {item.area}, {item.city}, {item.state}, {item.country}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "flex-start", alignItems: "center", marginTop: 5 }}>
-                            <TouchableOpacity onPress={() => { }} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Ionicons name="call-outline" size={24} color="black" style={{ margin: 5 }} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { }} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Ionicons name="mail-outline" size={24} color="black" style={{ margin: 5 }} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                </View>
-            }} keyExtractor={(item, index) => index.toString()} />
-            <View style={{ flexDirection: "row", justifyContent: "space-between", margin: 10 }}>
-            </View>
-        </View>
-    }
-
+    );
 
     return (
-        <View>
-           {showFilter? <FilterComponent />:<DonorDetailsComponents />}
-            {/* <DonorDetailsComponents /> */}
+        <View style={styles.container}>
+            <View style={styles.headerContainer}>
+                <Text style={styles.header}>Available Donors</Text>
+                <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>
+                    <Icon name="filter" size={24} color="#00796B" />
+                </TouchableOpacity>
+            </View>
+
+            {showFilter ? (
+                <FilterComponent
+                    bloodGroup={bloodGroup}
+                    setBloodGroup={setBloodGroup}
+                    state={state}
+                    setState={setState}
+                    city={city}
+                    setCity={setCity}
+                    setShowFilter={setShowFilter}
+                />
+            ) : (
+                <FlatList
+                    data={filteredDonors}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => <DonorCard donor={item} />}
+                />
+            )}
+
+            <Modal visible={showModal} transparent animationType="fade">
+                <View style={styles.overlay}>
+                    <View style={styles.modalBox}>
+                        <View style={styles.closeButtonContainer}>
+                            <Button title="✕" onPress={() => setShowModal(false)} />
+                        </View>
+
+                        <Text style={styles.title}>Report</Text>
+                        <Text style={styles.subtitle}>
+                            Didn’t find what you are looking for? Please report an issue or missing information
+                        </Text>
+
+                        <Picker
+                            selectedValue={suggestion}
+                            onValueChange={(itemValue) => setSuggestion(itemValue)}
+                            style={{ width: '100%', marginBottom: 20 }}
+                        >
+                            <Picker.Item label="Select a reason" value="" />
+                            <Picker.Item label="Not Available" value="Not Available" />
+                            <Picker.Item label="Not Answering the Call" value="Not Answering the Call" />
+                            <Picker.Item label="Not Interested" value="Not Interested" />
+                            <Picker.Item label="wrong number" value="wrong number" />
+                            <Picker.Item label="Donated recently" value="donated recently" />
+                            <Picker.Item label="Can't donate anymore" value="Can't donate anymore" />
+                            <Picker.Item label="Other" value="Other" />
+                        </Picker>
+
+                        {suggestion === 'Other' && (
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter your reason"
+                                placeholderTextColor="#999"
+                                multiline
+                                numberOfLines={3}
+                                value={customReason}
+                                onChangeText={setCustomReason}
+                            />
+                        )}
+
+                        <Button title="Send" onPress={handleSend} color="#FF6F91" />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
-    donorDetails: {
-        marginVertical: 2,
-        fontSize: 16
-    }
-})
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: 50,
+        paddingHorizontal: 10,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    header: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    card: {
+        flexDirection: 'row',
+        backgroundColor: '#f7f7f7',
+        padding: 10,
+        borderRadius: 10,
+        marginBottom: 15,
+        alignItems: 'center',
+    },
+    info: {
+        flex: 2,
+    },
+    name: {
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    phone: {
+        color: '#333',
+    },
+    blood: {
+        color: '#333',
+    },
+    status: {
+        fontWeight: 'bold',
+        marginTop: 4,
+    },
+    actions: {
+        flex: 1,
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+    },
+    reportBtn: {
+        backgroundColor: '#00A99D',
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 50,
+        marginBottom: 5,
+    },
+    callBtn: {
+        backgroundColor: '#00A99D',
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 50,
+    },
+    btnText: {
+        color: '#fff',
+    },
+    filterLabel: {
+        marginHorizontal: 20,
+        fontWeight: 'bold',
+        fontSize: 22,
+        marginTop: 20,
+    },
+    pickerContainer: {
+        marginRight: 10,
+        backgroundColor: '#f2f2f2',
+        borderRadius: 8,
+        margin:7
+    },
+    applyBtn: {
+        backgroundColor: '#00a99d',
+        padding: 10,
+        borderRadius: 10,
+        margin: 7,
+    },
+    overlay: {
+        flex: 1,
+        backgroundColor: '#00000040',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalBox: {
+        width: '85%',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        elevation: 10,
+    },
+    closeButtonContainer: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1,
+        opacity: 0.5,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1A1A1A',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#4B4B4B',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    input: {
+        backgroundColor: '#F8F8F8',
+        borderRadius: 12,
+        padding: 15,
+        fontSize: 14,
+        color: '#000',
+        width: '100%',
+        textAlignVertical: 'top',
+        marginBottom: 20,
+    },
+});
 
-export default BloodDonarDetails;
+export default AvailableDonorsScreen;

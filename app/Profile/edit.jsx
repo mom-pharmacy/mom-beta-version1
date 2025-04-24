@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+
 
 const HomeScreen = () => {
   const [firstName, setFirstName] = useState('');
@@ -137,7 +137,7 @@ const HomeScreen = () => {
           onChangeText={(text) => {
             if (text.length <= 10) setMobile(text);
           }}
-          placeholder="10-digit mobile number"
+          placeholder=" mobile number"
           keyboardType="numeric"
           placeholderTextColor="#888"
         />
@@ -163,25 +163,6 @@ const HomeScreen = () => {
           placeholderTextColor="#888"
         />
 
-        <Text style={styles.label}>Blood Group</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={bloodGroup}
-            onValueChange={(itemValue) => setBloodGroup(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Blood Group" value="" />
-            <Picker.Item label="A+" value="A+" />
-            <Picker.Item label="A-" value="A-" />
-            <Picker.Item label="B+" value="B+" />
-            <Picker.Item label="B-" value="B-" />
-            <Picker.Item label="O+" value="O+" />
-            <Picker.Item label="O-" value="O-" />
-            <Picker.Item label="AB+" value="AB+" />
-            <Picker.Item label="AB-" value="AB-" />
-          </Picker>
-        </View>
-
         <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
@@ -204,38 +185,28 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   label: {
+    fontWeight:'bold',
     fontSize: 15,
     marginTop: 10,
     marginBottom: 6,
-    color: '#fff',
+    color: '#555',
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
     color: '#333',
     marginBottom: 10,
   },
-  pickerContainer: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  picker: {
-    height: 50,
-    color: '#333',
-  },
   button: {
     backgroundColor: '#00A99D',
     marginTop: 20,
     paddingVertical: 15,
-    borderRadius: 8,
+    borderRadius: 20,
   },
   buttonText: {
     color: '#fff',

@@ -1,49 +1,86 @@
-
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
 
 export default function About() {
   return (
-    <ImageBackground
-   source={require('../../assets/images/img1.jpeg')}
-    style={styles.background}
-    resizeMode="cover"
-  >  
-      <BlurView intensity={80} tint="light" style={{height:300,marginTop:50,width:'80%'}}>
-        <Text style={styles.title}>About Us</Text>
-        <Text style={styles.content}>
-          
-We are a trusted medical delivery service committed to delivering essential
-        medical products quickly and safely. We Deliver Medicines On Minutes. Our team ensures timely deliveries and
-        customer satisfaction. Our service helps individuals and healthcare providers
-        get the medications and supplies they need, when they need them.
-        </Text>
-      </BlurView>
-    </ImageBackground>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <Text style={styles.header}>About Us</Text>
+
+        <View style={styles.cardContainer}>
+          <BlurView intensity={85} tint="light" style={styles.card}>
+            <Text style={styles.title}>Who We Are</Text>
+            <Text style={styles.text}>
+              We are a healthcare delivery platform committed to bringing medical supplies and essential medications to your doorstep quickly, safely, and reliably.
+            </Text>
+
+            <Text style={styles.title}>Our Mission</Text>
+            <Text style={styles.text}>
+              We aim to simplify access to critical healthcare by ensuring medications are delivered within minutes. Fast service. Full trust. Always.
+            </Text>
+
+            <Text style={styles.title}>Our Services</Text>
+            <Text style={styles.text}>
+              • Real-time order tracking{'\n'}
+              • 24/7 customer assistance{'\n'}
+              • Delivery within 10 minutes
+            </Text>
+          </BlurView>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#00856F',
+  },
+  scrollContainer: {
+    paddingTop: 80,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
     alignItems: 'center',
   },
-
-  title: {
-    fontFamily: "DM Sans",
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#00856F',
+  header: {
+    fontSize: 34,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 30,
+    fontFamily: 'DM Sans',
     textAlign: 'center',
   },
-  content: {
-    fontFamily: "DM Sans",
+  cardContainer: {
+    width: '100%',
+    maxWidth: 380,
+  },
+  card: {
+    borderRadius: 20,
+    padding: 24,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    overflow: 'hidden',    
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#00856F',
+    fontFamily: 'DM Sans',
+  },
+  text: {
     fontSize: 16,
-    color: '#000',
-    textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    color: '#333',
+    marginBottom: 18,
+    fontFamily: 'DM Sans',
   },
 });
