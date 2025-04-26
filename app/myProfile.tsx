@@ -96,7 +96,7 @@ const myProfile = () => {
           <Text style={styles.phone}>88976342121</Text>
         </View>
 
-        <MangeProfiles />
+        {/* <MangeProfiles /> */}
 
         <FlatList
           data={profileItems}
