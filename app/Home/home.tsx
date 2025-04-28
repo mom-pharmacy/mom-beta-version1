@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -27,9 +27,13 @@ import Categories from './categories';
 import useLocation from '@/hooks/useLocation';
 import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
+import { AuthContext } from '@/context/authContext';
 
 export default function Home() {
+
     const { locationName } = useLocation();
+    const {userDetails} = useContext(AuthContext);
+    console.log('User Details from home page:', userDetails);
     const handleUpload = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
@@ -84,7 +88,7 @@ export default function Home() {
 
 
                     <View style={styles.cartContainer} >
-                        <FontAwesome6 name="user-large" size={24} color="white" onPress={() => router.replace('../myProfile')} />
+                        <FontAwesome6 name="user-large" size={24} color="white" onPress={() => router.push('../myProfile')} />
                     </View>
                 </View>
 
@@ -187,7 +191,7 @@ export default function Home() {
 
 
                     <View style={styles.popular2} >
-                  
+
                         <View style={styles.popular}>
                             <Text style={styles.pop}>Popular Medicines</Text>
                             <Categories showSearch={false} />
