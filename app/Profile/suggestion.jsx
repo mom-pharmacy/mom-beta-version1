@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   Modal,
 } from 'react-native';
@@ -12,23 +12,28 @@ import { useNavigation } from '@react-navigation/native';
 const SuggestProduct = () => {
   const [suggestion, setSuggestion] = useState('');
   const [modalVisible, setModalVisible] = useState(true);
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
 
   const handleSend = () => {
     console.log(suggestion);
-
     setSuggestion('');
-    setModalVisible(false);
-    navigation.navigate('index'); 
+    setModalVisible(false); // Just close the modal, no navigation
+  };
+
+  const handleClose = () => {
+    setModalVisible(false); // Just close the modal, no navigation
   };
 
   return (
     <Modal visible={modalVisible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
-          <View style={[styles.closeButtonContainer, { opacity: 0.5 }]}>
-            <Button title="✕" onPress={() => navigation.navigate('index.jsx')} />
-          </View>
+          <TouchableOpacity
+            style={styles.closeButtonContainer}
+            onPress={handleClose}
+          >
+            <Text style={styles.closeButtonText}>×</Text>
+          </TouchableOpacity>
 
           <Text style={styles.title}>Suggest Products</Text>
           <Text style={styles.subtitle}>
@@ -45,7 +50,9 @@ const SuggestProduct = () => {
             onChangeText={setSuggestion}
           />
 
-          <Button title="Send" onPress={handleSend} color="#00A99D" />
+          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -74,6 +81,16 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: '#333',
   },
   title: {
     fontSize: 20,
@@ -97,5 +114,16 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlignVertical: 'top',
     marginBottom: 20,
+  },
+  sendButton: {
+    backgroundColor: '#00A99D',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

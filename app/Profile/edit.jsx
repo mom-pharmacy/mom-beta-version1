@@ -11,34 +11,32 @@ import {
   Platform,
 } from 'react-native';
 
-
 const HomeScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
+  const [mobile, setMobile] = useState('+91');
   const [dob, setDob] = useState('');
   const [age, setAge] = useState('');
-  const [bloodGroup, setBloodGroup] = useState('');
 
   const handleSave = () => {
     const emailRegex = /^[\w-.]+@gmail\.com$/;
-    const mobileRegex = /^\d{10}$/;
+    const mobileRegex = /^\+91\d{10}$/;
     const nameRegex = /^[A-Za-z]+$/;
     const dobRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/;
 
     const currentYear = new Date().getFullYear();
+    const parsedAge = parseInt(age, 10);
 
     if (
       !firstName ||
       !lastName ||
       !address ||
-      !age ||
+      isNaN(parsedAge) ||
       !mobile ||
       !email ||
-      !dob ||
-      !bloodGroup
+      !dob
     ) {
       Alert.alert('Missing Details', 'Please fill out all fields before saving.');
       return;
@@ -65,8 +63,7 @@ const HomeScreen = () => {
       return;
     }
 
-    if (age < 0 || age > 100) {
-
+    if (parsedAge < 0 || parsedAge > 100) {
       Alert.alert('Invalid Age', 'Age must be between 0 and 100.');
       return;
     }
@@ -77,7 +74,7 @@ const HomeScreen = () => {
     }
 
     if (!mobileRegex.test(mobile)) {
-      Alert.alert('Invalid Mobile', 'Mobile number must be exactly 10 digits.');
+      Alert.alert('Invalid Mobile', 'Mobile number must be 10 digits.');
       return;
     }
 
@@ -135,10 +132,17 @@ const HomeScreen = () => {
           style={styles.input}
           value={mobile}
           onChangeText={(text) => {
-            if (text.length <= 10) setMobile(text);
+            // Enforce +91 prefix
+            if (!text.startsWith('+91')) {
+              text = '+91';
+            }
+            // Only allow 10 digits after +91
+            if (text.length <= 13) {
+              setMobile(text);
+            }
           }}
-          placeholder=" mobile number"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
+          placeholder="+91XXXXXXXXXX"
           placeholderTextColor="#888"
         />
 
@@ -185,7 +189,7 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   label: {
-    fontWeight:'bold',
+    fontWeight: 'bold',
     fontSize: 15,
     marginTop: 10,
     marginBottom: 6,

@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
   const incrementItem = async (itemId) => {
     
       const updatedCart = cartItems.map(item =>
-        item.id === itemId
+        item._id === itemId
           ? { ...item, quantity: (item.quantity || 1) + 1 }
           : item
       );
@@ -48,15 +48,13 @@ export const CartProvider = ({ children }) => {
       setCartItems(updatedCart);
     };
     
-    
-
-  
+ 
 
   const decrementItem = async (itemId) => {
   setCartItems(prevCart => {
-    const fileter = prevCart.filter(item => item.id !== itemId);
+    const fileter = prevCart.filter(item => item._id !== itemId);
     const updatedCart = prevCart.map(item =>
-      item.id === itemId && item.quantity > 1
+      item._id === itemId && item.quantity > 1
         ? { ...item, quantity: item.quantity - 1 }
         : item
     );
@@ -69,7 +67,7 @@ export const CartProvider = ({ children }) => {
 
 
   const removeFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter(item => item.id !== itemId)); //
+    setCartItems((prevItems) => prevItems.filter(item => item._id !== itemId)); //
     console.log("this is from" , cartItems)
     AsyncStorage.setItem("carts", JSON.stringify(cartItems));
   };

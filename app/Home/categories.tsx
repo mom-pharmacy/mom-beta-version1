@@ -1,5 +1,5 @@
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -7,149 +7,89 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
-  Animated,
   TextInput,
 } from "react-native";
 import { useCart } from "../cartContext";
 import { router } from "expo-router";
-
-
-const medicines = [
-
-  {
-    id: '1',
-    name: "Dolo 650 Tablet",
-    sub: "Strip of 15 tab",
-    price: 28.53,
-
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '2',
-    name: "Ayu",
-    sub: "Strip of 15 tab",
-    price: 28.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '3',
-    name: "Diabetics",
-    sub: "Strip of 15 tab",
-    price: 28.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-
-  {
-    id: '4',
-    name: "Dolo 650",
-    sub: "Strip of 15 tab",
-    price: 28.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '5',
-    name: "Ayu",
-    sub: "Strip of 15 tab",
-    price: 39.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '6',
-    name: "Diabetics",
-    sub: "Strip of 15 tab",
-    price: 51.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-
-  {
-    id: '7',
-    name: "Dolo 650",
-    sub: "Strip of 15 tab",
-    price: 48.00,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '8',
-    name: "Ayu",
-    sub: "Strip of 15 tab",
-    price: 73.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '9',
-    name: "Diabetics",
-    sub: "Strip of 15 tab",
-    price: 48.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-
-  {
-    id: '10',
-    name: "Dolo 650",
-    sub: "Strip of 15 tab",
-    price: 48.00,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '11',
-    name: "Ayu",
-    sub: "Strip of 15 tab",
-    price: 73.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-  {
-    id: '12',
-    name: "Diabetics",
-    sub: "Strip of 15 tab",
-    price: 48.53,
-    image: require("../../assets/images/medicine.png"),
-  },
-
-];
-
 export default function Categories({ showSearch = true }) {
-  const { cartItems, addToCart, removeFromCart, incrementItem, decrementItem } = useCart()
+  const { cartItems, addToCart, removeFromCart, incrementItem, decrementItem } = useCart();
+  const [data, setData] = useState<any[]>([]);
+
+   // Navigation hook
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/medicines/");
+      const res = await response.json();
+      console.log("jashoww", res);
+
+      if (Array.isArray(res)) {
+        setData(res);
+      } else if (res.data) {
+        setData([res.data]);
+      } else {
+        setData([]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const quantity = (itemId) => {
-    const findItem = cartItems.find(item => item.id === itemId)
-    console.log(findItem)
-    return findItem.quantity
-  }
+    const findItem = cartItems.find(item => item._id === itemId);
+    return findItem ? findItem.quantity : 0;  // Return 0 if item not found
+  };
+
   return (
-    <>
-      <ScrollView style={{ marginBottom: 80, backgroundColor: 'white' }}>
+    <ScrollView style={{ marginBottom: 80, backgroundColor: 'white' }}>
+      {showSearch && (
+        <View style={styles.search}>
+          <EvilIcons name="search" size={24} color="black" style={styles.bar} />
+          <TextInput placeholder="search medicines" />
+        </View>
+      )}
 
-        {showSearch && (
-          <View style={styles.search}>
-            <EvilIcons name="search" size={24} color="black" style={styles.bar} />
-            <TextInput placeholder="search medicines" />
-          </View>
-        )}
-        
-       <View style={styles.cardContainer}>
-        {medicines.map((item) => (
-          <View style={styles.container} key={item.id}>
-
-            <TouchableOpacity
-              style={styles.card1}
-              onPress={() => router.push({
-                pathname: '/Open',
-                params: {
-                  id: item.id,
-                  name: item.name,
-                  sub: item.sub,
-                  price: item.price,
-                  image: item.image,
-                },
-              })}
-            >
-              <View style={styles.card1}>
+      {data.length === 0 ? (
+        <Text>No data found!</Text>
+      ) : (
+        <View style={styles.cardContainer}>
+          {data.map((item) => (
+            <View style={styles.container} key={item._id}>
+              <TouchableOpacity
+                style={styles.card1}
+                onPress={() => router.push({
+                  pathname: '/Open',
+                  params: {
+                    id: item._id,
+                    name: item.name,
+                    price: item.price,
+                    image: item.imageUrl,
+                    description:item.description,
+                    Expirydate:item.Expirydate
+                  }},)}
+              >
                 <View style={styles.card}>
                   <View style={styles.imageContainer}>
-                    <Image style={styles.image} source={item.image} />
+                    {item.imageUrl ? (
+                      <Image
+                          source={{
+                            uri: `http://localhost:3000${item.imageUrl}`  // Dynamic image URL
+                          }}
+                          style={styles.image}
+                          resizeMode="contain"
+                        
+                      />
+                    ) : (
+                      <View style={styles.noImageContainer}>
+                        <Text style={styles.noImageText}>No Image</Text>
+                      </View>
+                    )}
 
-                    {!cartItems.some((itemcart) => item.id === itemcart.id) ? (
+                    {!cartItems.some((itemcart) => item._id === itemcart._id) ? (
                       <TouchableOpacity
                         onPress={() => addToCart(item)}
                         style={styles.overlayAddBtn}
@@ -160,15 +100,15 @@ export default function Categories({ showSearch = true }) {
                       <View style={styles.overlayCounter}>
                         <TouchableOpacity
                           onPress={() =>
-                            quantity(item.id) > 1
-                              ? decrementItem(item.id)
-                              : removeFromCart(item.id)
+                            quantity(item._id) > 1
+                              ? decrementItem(item._id)
+                              : removeFromCart(item._id)
                           }
                         >
                           <Text style={styles.counterBtn}>−</Text>
                         </TouchableOpacity>
-                        <Text style={styles.counterText}>{quantity(item.id)}</Text>
-                        <TouchableOpacity onPress={() => incrementItem(item.id)}>
+                        <Text style={styles.counterText}>{quantity(item._id)}</Text>
+                        <TouchableOpacity onPress={() => incrementItem(item._id)}>
                           <Text style={styles.counterBtn}>+</Text>
                         </TouchableOpacity>
                       </View>
@@ -177,22 +117,17 @@ export default function Categories({ showSearch = true }) {
                 </View>
 
                 <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.sub}>{item.sub}</Text>
+                <Text style={styles.name}>{item.Expirydate}</Text>
                 <View style={styles.priceRow}>
                   <Text style={styles.price}>{item.price}</Text>
-
                 </View>
-              </View>
-            </TouchableOpacity>
-
-          </View>
-        ))}
+                <Text>{item.quantity}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
-
-      </ScrollView>
-
-
-    </>
+      )}
+    </ScrollView>
   );
 }
 
@@ -202,10 +137,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: 10,
-    marginTop:20
+    marginTop: 20
   },
   container: {
-    width: "30%", 
+    width: "30%",
     marginBottom: 15,
 
   },

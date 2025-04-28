@@ -16,7 +16,7 @@ export default function Cart() {
   };
 
   const quantity = (itemId) => {
-    const findItem = cartItems.find(item => item.id === itemId);
+    const findItem = cartItems.find(item => item._id === itemId);
     return findItem.quantity;
   };
 
@@ -31,11 +31,11 @@ export default function Cart() {
 
       <FlatList
         data={cartItems}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.cartItem}>
             <View style={styles.imageBox}>
-              <Image style={styles.image} source={item.image} />
+              <Image style={styles.image} source={{ uri: `http://localhost:3000${item.imageUrl}` }} />
             </View>
             <View style={{ flexDirection: 'column', gap: 4, flex: 2 }}>
               <Text style={styles.name}>{item.name}</Text>
@@ -44,16 +44,16 @@ export default function Cart() {
             <View style={styles.qtySection}>
               <TouchableOpacity
                 onPress={() =>
-                  quantity(item.id) > 1
-                    ? decrementItem(item.id)
-                    : removeFromCart(item.id)
+                  quantity(item._id) > 1
+                    ? decrementItem(item._id)
+                    : removeFromCart(item._id)
                 }
                 style={styles.qtyButton}
               >
                 <Text style={styles.qtyButtonText}>−</Text>
               </TouchableOpacity>
-              <Text>{quantity(item.id)}</Text>
-              <TouchableOpacity onPress={() => incrementItem(item.id)} style={styles.qtyButton}>
+              <Text>{quantity(item._id)}</Text>
+              <TouchableOpacity onPress={() => incrementItem(item._id)} style={styles.qtyButton}>
                 <Text style={styles.qtyButtonText}>+</Text>
               </TouchableOpacity>
             </View>

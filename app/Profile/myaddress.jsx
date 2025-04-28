@@ -29,9 +29,9 @@ const MyAddressesScreen = () => {
     setModalVisible(false);
   };
 
-  const handleLocation=() =>{
-    router.replace('./addAddress');
-  };
+  // const handleLocation=() =>{
+  //   router.replace('./addAddress');
+  // };
   const handleWhatsAppClick = () => {
     const message = "Please share your delivery location to ensure a hassle-free delivery by clicking on this link";
     const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
@@ -65,8 +65,8 @@ const MyAddressesScreen = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Add Address */}
-      <TouchableOpacity style={styles.button} onPress={handleLocation}>
-        <Icon name="plus-circle" size={24} color="#5cb85c" style={styles.icon} />
+      <TouchableOpacity style={styles.button}  onPress={()=>router.push('./addAddress')}>
+        <Icon name="plus-circle" size={24} color="#5cb85c" style={styles.icon}  />
         <Text style={styles.buttonText}>Add new address</Text>
         <Icon name="chevron-right" size={20} color="gray" style={styles.arrowIcon} />
       </TouchableOpacity>

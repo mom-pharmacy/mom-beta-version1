@@ -1,5 +1,5 @@
-
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
 export default function OrdersScreen() {
@@ -23,22 +23,36 @@ export default function OrdersScreen() {
       date: '2025-04-18',
     },
   ];
+
+  const[data, setData]=useState();
  
+  useEffect(()=>{
+   getData();
+  },[])
+
+  const getData = async()=>{
+   try{
+    const response = await fetch("http://localhost:3000/api/order/");
+    const data = await response.json();
+    console.log("jashoww",data)
+    setData(data)
+
+
+   }catch(err){
+    console.log(err)
+   }
+    
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>My Orders</Text>
-      {orders.map((order) => (
+     
+   {orders.map((order) => (
         <View key={order.id} style={styles.orderCard}>
-          <Text style={styles.orderTitle}>Order: #{order.id}</Text>
+          <Text style={styles.orderTitle}>{order.id}</Text>
           <Text style={styles.orderStatus}>Status: {order.status}</Text>
-          <Text style={styles.orderDate}>Order Date: {order.date}</Text>
-          <Text style={styles.trackingText}>Tracking Info: {order.tracking}</Text>
-          {order.status !== 'Delivered' && (
-            <TouchableOpacity style={styles.trackButton}>
-              <Text style={styles.trackButtonText}>Track Order</Text>
-            </TouchableOpacity>
-          )}
+         
         </View>
       ))}
     </ScrollView>

@@ -1,49 +1,43 @@
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
 
-type UseLocationReturnType = {
-  latitude: string;
-  longitude: string;
-  locationName: string;
-  errorMsg: string;
+export type LocationType = {
+  latitude: number;
+  longitude: number;
 };
 
-const useLocation = (): UseLocationReturnType => {
-  const [latitude, setLatitude] = useState<string>("");
-  const [longitude, setLongitude] = useState<string>("");
-  const [locationName, setLocationName] = useState<string>("");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+type UseLocationReturnType = {
+  location: LocationType | null;
+  address: string;
+};
+
+export const useLocation = (): UseLocationReturnType => {
+  const [location, setLocation] = useState<LocationType | null>(null);
+  const [address, setAddress] = useState<string>("");
 
   const getUserLocation = async () => {
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
-        setErrorMsg("Permission to access location was not granted");
+        console.error("Permission denied!");
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync();
+      const locationData = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = locationData.coords;
 
-      if (location?.coords) {
-        const { latitude, longitude } = location.coords;
-        setLatitude(latitude.toString());
-        setLongitude(longitude.toString());
+      setLocation({ latitude, longitude });
 
-        const response = await Location.reverseGeocodeAsync({
-          latitude,
-          longitude,
-        });
+      const geoCode = await Location.reverseGeocodeAsync({ latitude, longitude });
 
-        if (response?.length > 0) {
-          const loc = response[0];
-          const name = `${loc.name || ""}, ${loc.city || loc.region || ""}`;
-          setLocationName(name);
-        }
+      if (geoCode.length > 0) {
+        const place = geoCode[0];
+        const fullAddress = `${place.name ?? place.street ?? place.city ?? place.region ?? place.country ?? "Unknown"}`;
+        setAddress(fullAddress);
       }
     } catch (error) {
-      setErrorMsg("Something went wrong while fetching location");
-      console.error("Location Error:", error);
+      console.error("Error getting location:", error);
     }
   };
 
@@ -51,7 +45,5 @@ const useLocation = (): UseLocationReturnType => {
     getUserLocation();
   }, []);
 
-  return { latitude, longitude, locationName, errorMsg };
+  return { location, address };
 };
-
-export default useLocation;

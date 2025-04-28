@@ -24,7 +24,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import Categories from './categories';
-import useLocation from '@/hooks/useLocation';
+import {useLocation} from '@/hooks/useLocation';
 import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
 
@@ -61,7 +61,7 @@ export default function Home() {
     };
 
     const handleLocation = () => {
-        router.replace('../Profile/myaddress')
+        router.push('../Profile/myaddress')
     }
 
     return (
