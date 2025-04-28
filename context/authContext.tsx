@@ -140,6 +140,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       userDetails,
       isRegistrationComplete,
+      getUserDetails
     }}>
       {loading ? <LoadingScreen/> : children}
     </AuthContext.Provider>

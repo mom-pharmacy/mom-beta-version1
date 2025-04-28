@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,13 +17,13 @@ import { AuthContext } from '@/context/authContext';
 
 export default function RegistrationScreen() {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
   const [gender, setGender] = useState('');
   const [dob, setDob] = useState('');
+  const [LoadingReg , setLoadingReg] = useState(false)
+
 
   const navigation = useNavigation();
-  const {logout} = useContext(AuthContext);
+  const {logout , getUserDetails} = useContext(AuthContext);
 
   const validateInputs = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
@@ -30,7 +31,7 @@ export default function RegistrationScreen() {
     const mobileRegex = /^[0-9]{10}$/;
     const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-    if (!name || !email || !mobileNumber || !gender || !dob) {
+    if (!name || !gender || !dob) {
       Alert.alert('Error', 'All fields are required');
       return false;
     }
@@ -40,15 +41,6 @@ export default function RegistrationScreen() {
       return false;
     }
 
-    if (!emailRegex.test(email)) {
-      Alert.alert('Invalid Email', 'Enter a valid email');
-      return false;
-    }
-
-    if (!mobileRegex.test(mobileNumber)) {
-      Alert.alert('Invalid Mobile Number', 'Enter a valid 10-digit mobile number');
-      return false;
-    }
 
     if (!dobRegex.test(dob)) {
       Alert.alert('Invalid DOB', 'Use format YYYY-MM-DD');
@@ -58,41 +50,50 @@ export default function RegistrationScreen() {
     return true;
   };
 
+  const refreshUser = async () => {
+    console.log("this is refreshing..")
+    await getUserDetails();
+  };
+
+  const postData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("user")
+      const parsedToken = JSON.parse(token)
+      const options = {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",  // 🛠️ Important
+          "Authorization": `Bearer ${parsedToken}`
+        },
+        body: JSON.stringify({
+          name,
+          dateOfBirth: dob,
+          gender
+        })
+      };
+      setLoadingReg(true);
+      const response = await fetch("https://mom-beta-server.onrender.com/api/user/register", options);
+      if (response.ok) {
+        console.log("user successfully registered");
+        await refreshUser(); 
+        router.replace("/Home/home");
+      } else {
+        const errorData = await response.text();
+        console.error("Server error response:", errorData);
+        Alert.alert("Registration Error", "Something went wrong. Please try again.");
+      }
+    } catch (e) {
+      console.error("this is from fetch signup:", e);
+      Alert.alert("Network Error", "Failed to register. Check your internet or server.");
+    } finally {
+      setLoadingReg(false);
+    }
+  };
+
   const handleCreateAccount = async () => {
     if (!validateInputs()) return;
+    postData()
 
-    const newUser = {
-      name,
-      email: email.trim().toLowerCase(),
-      mobileNumber: mobileNumber.trim(),
-      gender,
-      dob,
-    };
-
-    try {
-      const existingUsersJSON = await AsyncStorage.getItem('users');
-      const existingUsers = existingUsersJSON ? JSON.parse(existingUsersJSON) : [];
-
-      const alreadyExists = existingUsers.some(
-        (user) =>
-          user.email.toLowerCase() === newUser.email ||
-          user.mobileNumber === newUser.mobileNumber
-      );
-
-      if (alreadyExists) {
-        Alert.alert('User already exists', 'An account with this email or mobile already exists.');
-        return;
-      }
-
-      existingUsers.push(newUser);
-      await AsyncStorage.setItem('users', JSON.stringify(existingUsers));
-
-      Alert.alert('Success', 'Account created successfully!');
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save user data');
-      console.error(error);
-    }
   };
 
   return (
@@ -137,8 +138,8 @@ export default function RegistrationScreen() {
         style={styles.input}
       />
 
-      <TouchableOpacity onPress={handleCreateAccount} style={styles.button}>
-        <Text style={styles.buttonText}>Create Account</Text>
+      <TouchableOpacity onPress={handleCreateAccount} style={styles.button} disabled={LoadingReg}>
+       {LoadingReg?<ActivityIndicator/> : <Text style={styles.buttonText}>Create Account</Text>}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() =>logout() } style={styles.backButton}>
