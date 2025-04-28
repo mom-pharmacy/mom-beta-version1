@@ -1,36 +1,31 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   Image, StyleSheet, Alert, KeyboardAvoidingView,
   Platform, ScrollView, TouchableWithoutFeedback, Keyboard,
   Dimensions,
+  ActivityIndicator, 
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { sendOtp, sendSmsOtp } from '../lib/otp';
-import { isEmail, isPhone } from '../constants/regex';
+import { sendOtp, sendSmsOtp } from '../../lib/otp';
+import { isEmail, isPhone } from '../../constants/regex';
+import { AuthContext } from '@/context/authContext';
 
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [input, setInput] = useState('');
+  const [loading , setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSendOtp = async () => {
-    try {
-      if (isEmail(input)) {
-        await sendOtp(input);
-      } else if (isPhone(input)) {
-        await sendSmsOtp(input);
-      } else {
-        Alert.alert('Enter a valid email or mobile number');
-        return;
-      }
+  const {loginWithOtp} = useContext(AuthContext);
+ 
 
-      router.push({ pathname: '/otp', params: { user: input } });
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Failed to send OTP');
-    }
+  const handleSendOtp = async () => {
+    console.log('Input:', input);
+    setLoading(true);
+    await loginWithOtp(input);
+    setLoading(false)
   };
 
   return (
@@ -47,13 +42,13 @@ export default function LoginScreen() {
           <View style={styles.inner}>
             <View style={styles.topSection}>
               <Image
-                source={require('../assets/images/picimg.png')}
+                source={require('@/assets/images/picimg.png')}
                 style={styles.image}
               />
               <Text style={styles.tagline}>Instant medicine to your door step</Text>
             </View>
 
-            
+
             <View style={styles.bottomCard}>
               <Text style={styles.heading}>
                 Sign In /{' '}
@@ -68,15 +63,19 @@ export default function LoginScreen() {
                 <Text style={styles.countryCode}>+91</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your number or email"
-                  keyboardType="default"
+                  placeholder="Enter your number"
                   value={input}
                   onChangeText={setInput}
+                  keyboardType="numeric"
                 />
               </View>
 
-              <TouchableOpacity style={styles.otpButton} onPress={handleSendOtp}>
-                <Text style={styles.otpText}>Send OTP</Text>
+              <TouchableOpacity style={styles.otpButton} onPress={handleSendOtp} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.otpText}>Send OTP</Text>
+                )}
               </TouchableOpacity>
 
               <View style={{ height: 30 }} />

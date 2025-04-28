@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { sendSmsOtp, verifyOtp } from '../lib/otp';
+import { sendSmsOtp, verifyOtp } from '../../lib/otp';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '@/context/authContext';
 
 export default function OtpScreen() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -10,6 +11,8 @@ export default function OtpScreen() {
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef([]);
   const { user } = useLocalSearchParams();
+
+  const { verifyOtp} = useContext(AuthContext);
 
   useEffect(() => {
     let interval;
@@ -42,14 +45,17 @@ export default function OtpScreen() {
     }
   };
 
+  
+
   const handleVerifyOtp = async () => {
     const fullOtp = otp.join('');
-    const isValid = await verifyOtp(fullOtp);
-if (isValid) {
-  router.replace('./Home/home');
-} else {
-  Alert.alert('Invalid OTP');
-}
+    const isValid = await verifyOtp(fullOtp , user);
+
+    if (isValid) {
+      router.replace('../Home/home');
+    } else {
+      Alert.alert('Invalid OTP');
+    }
 
   };
 
@@ -59,13 +65,13 @@ if (isValid) {
       setTimer(30);
       setCanResend(false);
       await sendSmsOtp(typeof user === 'string' ? user : user[0]);
-      Alert.alert('OTP Resend','A new Otp has been sent to your phone');
+      Alert.alert('OTP Resend', 'A new Otp has been sent to your phone');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/momlogo.jpeg')} style={styles.logo} />
+      <Image source={require('@/assets/images/momlogo.jpeg')} style={styles.logo} />
 
       <Text style={styles.heading}>Enter OTP</Text>
       <Text style={styles.subtext}>Please enter the OTP to access our Services</Text>
@@ -161,7 +167,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  
+
   verifyButtonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -169,5 +175,5 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
-  
+
 });

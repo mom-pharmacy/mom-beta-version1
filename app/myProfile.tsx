@@ -1,9 +1,10 @@
 // app/profile/index.jsx
-import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ScrollView } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MangeProfiles from './Profile/ManageProfiles';
 import ProfileItem from './Profile/ProfileItems';
+import { AuthContext } from '@/context/authContext';
 
 const profileItems = [
     {
@@ -78,25 +79,20 @@ const profileItems = [
     icon: <Ionicons name="arrow-forward" size={20} color="#ccc" />,
     link: '/Profile/hs',
   },
-  {
-    name: 'Logout',
-    mainIcon: <Ionicons name="log-out-outline" size={24} color="#00a99d" />,
-    icon: <Ionicons name="arrow-forward" size={20} color="#ccc" />,
-    link: '/Profile/Login',
-  },
 ];
 
 const myProfile = () => {
+  const {logout , userDetails} = useContext(AuthContext);
   return (
     <ScrollView>
       <View>
         <View style={styles.header}>
           <Image source={require('./../assets/images/momlogo.jpeg')} style={styles.profileImage} />
-          <Text style={styles.name}>John Doe</Text>
-          <Text style={styles.phone}>88976342121</Text>
+          <Text style={styles.name}>{userDetails.name}</Text>
+          <Text style={styles.phone}>{userDetails.mobileNo}</Text>
         </View>
 
-        <MangeProfiles />
+        {/* <MangeProfiles /> */}
 
         <FlatList
           data={profileItems}
@@ -111,6 +107,18 @@ const myProfile = () => {
           )}
           scrollEnabled={false}
         />
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#00a99d',
+            padding: 10,
+            borderRadius: 5,
+            margin: 20,
+            alignItems: 'center',
+          }}
+          onPress={() => logout()}
+        >
+          <Text style={{ color: 'white', fontSize: 16 }}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
