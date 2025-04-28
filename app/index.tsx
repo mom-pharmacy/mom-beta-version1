@@ -7,7 +7,7 @@ import Home from './Home/home';
 import LoginScreen from './Login/Login';
 
 export default function index() {
-  const {userDetails} = useContext(AuthContext);
+  
   useEffect(() => { 
     const checkUser = async () => { 
       // await AsyncStorage.clear(); // Clear AsyncStorage for testing purposes
@@ -21,6 +21,7 @@ export default function index() {
     }
     checkUser();  
   } , []);
+
 
   return null
 }

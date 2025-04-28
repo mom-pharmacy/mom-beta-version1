@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { AuthContext } from '@/context/authContext';
 
 export default function RegistrationScreen() {
   const [name, setName] = useState('');
@@ -20,6 +22,7 @@ export default function RegistrationScreen() {
   const [dob, setDob] = useState('');
 
   const navigation = useNavigation();
+  const {logout} = useContext(AuthContext);
 
   const validateInputs = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
@@ -111,22 +114,7 @@ export default function RegistrationScreen() {
         style={styles.input}
       />
 
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        placeholder="Mobile Number"
-        value={mobileNumber}
-        onChangeText={setMobileNumber}
-        style={styles.input}
-        keyboardType="phone-pad"
-      />
+    
 
       <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Gender</Text>
       <View style={styles.radioContainer}>
@@ -153,7 +141,7 @@ export default function RegistrationScreen() {
         <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <TouchableOpacity onPress={() =>logout() } style={styles.backButton}>
         <Text style={styles.backButtonText}>Back to Login</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -228,4 +216,7 @@ const styles = StyleSheet.create({
   selectedRadio: {
     backgroundColor: '#00bfa6',
   },
+  pagetext:{
+
+  }
 });

@@ -1,3 +1,4 @@
+import LoadingScreen from "@/components/LoadingScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { createContext, useEffect, useState, useCallback } from "react";
@@ -11,11 +12,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
 
+  // Check registration manually
+  const isRegistrationComplete = userDetails?.name && userDetails?.email && userDetails?.mobileNo;
+
   // Fetch user details
   const getUserDetails = useCallback(async (authToken) => {
     try {
       if (!authToken) return;
-
+      setLoading(true)
       const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
         method: 'GET',
         headers: {
@@ -27,6 +31,9 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         setUserDetails(data.userDetails);
+        setLoading(false);
+        // Check fields immediately after fetching
+
       } else {
         console.error('Failed to fetch user details:', response.statusText);
       }
@@ -37,6 +44,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already logged in
   useEffect(() => {
+    // AsyncStorage.clear()
     const checkUser = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('user');
@@ -69,12 +77,12 @@ export const AuthProvider = ({ children }) => {
         router.replace({ pathname: '/Login/otp', params: { user: mobileNo } });
         console.log('Login successful:', data);
       } else {
-        Alert.alert('Login failed!');
+        Alert.alert('Login failed!', 'Unable to login. Please try again.');
         console.error('Login failed:', response.statusText);
       }
     } catch (error) {
       console.error('Error during login:', error);
-      Alert.alert('An error occurred during login!');
+      Alert.alert('An error occurred during login. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -99,10 +107,12 @@ export const AuthProvider = ({ children }) => {
         return true;
       } else {
         console.error('OTP verification failed:', response.statusText);
+        Alert.alert('OTP verification failed', 'Invalid OTP. Please try again.');
         return false;
       }
     } catch (error) {
       console.error('Error during OTP verification:', error);
+      Alert.alert('An error occurred during OTP verification. Please try again.');
       return false;
     }
   };
@@ -117,12 +127,21 @@ export const AuthProvider = ({ children }) => {
       router.replace('/Login/Login');
     } catch (error) {
       console.error('Error during logout:', error);
+      Alert.alert('Error', 'An error occurred during logout. Please try again.');
     }
   };
 
   return (
-    <AuthContext.Provider value={{ loginWithOtp, verifyOtp, logout, isLoggedIn, loading, userDetails }}>
-      {children}
+    <AuthContext.Provider value={{
+      loginWithOtp,
+      verifyOtp,
+      logout,
+      isLoggedIn,
+      loading,
+      userDetails,
+      isRegistrationComplete,
+    }}>
+      {loading ? <LoadingScreen/> : children}
     </AuthContext.Provider>
   );
 };

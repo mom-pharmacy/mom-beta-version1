@@ -24,7 +24,8 @@ export default function LoginScreen() {
   const handleSendOtp = async () => {
     console.log('Input:', input);
     setLoading(true);
-    loginWithOtp(input);
+    await loginWithOtp(input);
+    setLoading(false)
   };
 
   return (
