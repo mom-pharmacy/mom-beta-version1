@@ -9,21 +9,22 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { AuthContext } from '@/context/authContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function RegistrationScreen() {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
   const [dob, setDob] = useState('');
-  const [LoadingReg , setLoadingReg] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [LoadingReg, setLoadingReg] = useState(false)
 
-
-  const navigation = useNavigation();
-  const {logout , getUserDetails} = useContext(AuthContext);
+  const { logout, postData } = useContext(AuthContext);
 
   const validateInputs = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
@@ -41,83 +42,46 @@ export default function RegistrationScreen() {
       return false;
     }
 
-
     if (!dobRegex.test(dob)) {
       Alert.alert('Invalid DOB', 'Use format YYYY-MM-DD');
       return false;
     }
-
     return true;
   };
 
-  const refreshUser = async () => {
-    console.log("this is refreshing..")
-    await getUserDetails();
-  };
-
-  const postData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("user")
-      const parsedToken = JSON.parse(token)
-      const options = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",  // 🛠️ Important
-          "Authorization": `Bearer ${parsedToken}`
-        },
-        body: JSON.stringify({
-          name,
-          dateOfBirth: dob,
-          gender
-        })
-      };
-      setLoadingReg(true);
-      const response = await fetch("https://mom-beta-server.onrender.com/api/user/register", options);
-      if (response.ok) {
-        console.log("user successfully registered");
-        await refreshUser(); 
-        router.replace("/Home/home");
-      } else {
-        const errorData = await response.text();
-        console.error("Server error response:", errorData);
-        Alert.alert("Registration Error", "Something went wrong. Please try again.");
-      }
-    } catch (e) {
-      console.error("this is from fetch signup:", e);
-      Alert.alert("Network Error", "Failed to register. Check your internet or server.");
-    } finally {
-      setLoadingReg(false);
+  const onChangeDate = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      setDob(`${year}-${month}-${day}`);
     }
   };
 
+
   const handleCreateAccount = async () => {
     if (!validateInputs()) return;
-    postData()
-
+    postData(name, dob, gender)
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.pagetext}>Register Now!</Text>
-
       <Image
         source={require('../assets/images/momlogo.jpeg')}
         style={styles.logo}
         resizeMode="contain"
       />
-
       <Text style={styles.welcomeText}>Welcome to MOM Pharmacy</Text>
-
       <TextInput
         placeholder="Full Name"
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
-
-    
-
       <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Gender</Text>
+
       <View style={styles.radioContainer}>
         {['Male', 'Female', 'Other'].map((option) => (
           <TouchableOpacity
@@ -131,18 +95,41 @@ export default function RegistrationScreen() {
         ))}
       </View>
 
-      <TextInput
-        placeholder="Date of Birth (YYYY-MM-DD)"
-        value={dob}
-        onChangeText={setDob}
-        style={styles.input}
-      />
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
 
-      <TouchableOpacity onPress={handleCreateAccount} style={styles.button} disabled={LoadingReg}>
-       {LoadingReg?<ActivityIndicator/> : <Text style={styles.buttonText}>Create Account</Text>}
+        <Text style={{ color: dob ? '#000' : '#aaa' }}>
+
+          {dob || 'Select Date of Birth (DD-MM-YYYY)'}
+
+        </Text>
+
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() =>logout() } style={styles.backButton}>
+
+
+      {showDatePicker && (
+
+        <DateTimePicker
+
+          value={dob ? new Date(dob) : new Date()}
+
+          mode="date"
+
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+
+          maximumDate={new Date()}
+
+          onChange={onChangeDate}
+
+        />
+
+      )}
+
+      <TouchableOpacity onPress={handleCreateAccount} style={styles.button} disabled={LoadingReg}>
+        {LoadingReg ? <ActivityIndicator /> : <Text style={styles.buttonText}>Create Account</Text>}
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => logout()} style={styles.backButton}>
         <Text style={styles.backButtonText}>Back to Login</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -156,6 +143,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    fontWeight:'bold',
+
   },
   logo: {
     width: 120,
@@ -217,7 +206,7 @@ const styles = StyleSheet.create({
   selectedRadio: {
     backgroundColor: '#00bfa6',
   },
-  pagetext:{
+  pagetext: {
 
   }
 });

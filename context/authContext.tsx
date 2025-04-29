@@ -12,14 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
 
-  // Check registration manually
   const isRegistrationComplete = userDetails?.name && userDetails?.email && userDetails?.mobileNo;
 
-  // Fetch user details
   const getUserDetails = useCallback(async (authToken) => {
     try {
       if (!authToken) return;
-      setLoading(true)
       const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
         method: 'GET',
         headers: {
@@ -30,10 +27,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUserDetails(data.userDetails);
-        setLoading(false);
-        // Check fields immediately after fetching
-
+        setUserDetails(data.userDetails); // ✅ Update local userDetails
       } else {
         console.error('Failed to fetch user details:', response.statusText);
       }
@@ -42,9 +36,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Check if user is already logged in
   useEffect(() => {
-    // AsyncStorage.clear()
     const checkUser = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('user');
@@ -52,7 +44,7 @@ export const AuthProvider = ({ children }) => {
           const parsedToken = JSON.parse(storedToken);
           setToken(parsedToken);
           setIsLoggedIn(true);
-          getUserDetails(parsedToken);
+          await getUserDetails(parsedToken);
         }
       } catch (error) {
         console.error('Error checking user:', error);
@@ -63,7 +55,6 @@ export const AuthProvider = ({ children }) => {
     checkUser();
   }, [getUserDetails]);
 
-  // Login with OTP
   const loginWithOtp = async (mobileNo) => {
     try {
       const response = await fetch('https://mom-beta-server.onrender.com/api/user/login', {
@@ -78,7 +69,6 @@ export const AuthProvider = ({ children }) => {
         console.log('Login successful:', data);
       } else {
         Alert.alert('Login failed!', 'Unable to login. Please try again.');
-        console.error('Login failed:', response.statusText);
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -88,7 +78,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Verify OTP
   const verifyOtp = async (otp, mobileNo) => {
     try {
       const response = await fetch('https://mom-beta-server.onrender.com/api/user/verify-otp', {
@@ -102,11 +91,10 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.setItem('user', JSON.stringify(data.token));
         setToken(data.token);
         setIsLoggedIn(true);
-        getUserDetails(data.token);
+        await getUserDetails(data.token); // ✅ Update user details after login
         console.log('OTP verified:', data);
         return true;
       } else {
-        console.error('OTP verification failed:', response.statusText);
         Alert.alert('OTP verification failed', 'Invalid OTP. Please try again.');
         return false;
       }
@@ -117,7 +105,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout
   const logout = async () => {
     try {
       await AsyncStorage.removeItem('user');
@@ -131,6 +118,42 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const postData = async (name, dob, gender) => {
+    try {
+      const storedToken = await AsyncStorage.getItem("user");
+      const parsedToken = JSON.parse(storedToken);
+
+      const response = await fetch("https://mom-beta-server.onrender.com/api/user/register", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${parsedToken}`
+        },
+        body: JSON.stringify({
+          name:name,
+          dateOfBirth: dob,
+          gender:gender
+        })
+      });
+
+      if (response.ok) {
+        console.log("User successfully registered");
+
+        // ✅ After successful registration, refetch latest user details
+        await getUserDetails(parsedToken);
+
+        router.replace("/Home/home");
+      } else {
+        const errorData = await response.text();
+        console.error("Server error response:", errorData);
+        Alert.alert("Registration Error", "Something went wrong. Please try again.");
+      }
+    } catch (e) {
+      console.error("this is from fetch signup:", e);
+      Alert.alert("Network Error", "Failed to register. Check your internet or server.");
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       loginWithOtp,
@@ -140,9 +163,10 @@ export const AuthProvider = ({ children }) => {
       loading,
       userDetails,
       isRegistrationComplete,
-      getUserDetails
+      getUserDetails,
+      postData
     }}>
-      {loading ? <LoadingScreen/> : children}
+      {loading ? <LoadingScreen /> : children}
     </AuthContext.Provider>
   );
 };
