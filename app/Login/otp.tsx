@@ -52,7 +52,7 @@ export default function OtpScreen() {
     const isValid = await verifyOtp(fullOtp , user);
 
     if (isValid) {
-      router.replace('../Home/home');
+      router.replace('../Home/Home');
     } else {
       Alert.alert('Invalid OTP');
     }

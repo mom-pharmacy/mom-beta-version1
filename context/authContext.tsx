@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    // AsyncStorage.clear()
     const checkUser = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('user');

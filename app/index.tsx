@@ -14,7 +14,7 @@ export default function index() {
       const user = await AsyncStorage.getItem('user');
       console.log('User:', user);
       if (user) {
-        router.replace('/Home/home');
+        router.replace('/Home/Home');
       } else {
         router.replace('/Login/Login');
       }
