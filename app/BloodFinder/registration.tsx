@@ -140,7 +140,7 @@ export default function Index() {
 
           <View style={styles.logoContainer}>
             <View style={styles.headerRow}>
-              <TouchableOpacity onPress={() => navigation.navigate('../Home/home')}>
+              <TouchableOpacity onPress={()=>Alert.alert("pressed")}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
               <Text style={styles.heading}>Register Now to Donate!</Text>

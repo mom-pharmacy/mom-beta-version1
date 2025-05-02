@@ -12,7 +12,7 @@ import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
 // import Icon from 'react-native-vector-icons/Ionicons';
 
-const myProfile = () => {
+const MyProfile = () => {
   const [selectedState, setSelectedState] = React.useState('');
   const [selectedDistrict, setSelectedDistrict] = React.useState('');
   const [selectedCity, setSelectedCity] = React.useState('');
@@ -95,7 +95,7 @@ const myProfile = () => {
       </Picker>
 
       <TouchableOpacity style={styles.searchButton} onPress={()=>{
-        router.replace("./donarDetails")
+        router.push("/BloodFinder/donarDetails")
       }}>
         <Text style={styles.searchText}>Search</Text>
       </TouchableOpacity>
@@ -177,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default myProfile;
+export default MyProfile;
