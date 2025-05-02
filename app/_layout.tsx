@@ -1,19 +1,19 @@
 import { Stack } from "expo-router";
-import { CartProvider } from './cartContext';
-import { AuthProvider } from "@/context/authContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { LocationProvider } from "./locationContext";
+
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <CartProvider>
+    
+    <LocationProvider>
         <Stack screenOptions={{ headerShown: false }}>
 
           <Stack.Screen name="Home" />
         </Stack>
+        </LocationProvider>
 
-      </CartProvider>
-    </AuthProvider>
+     
+   
   )
 
 }

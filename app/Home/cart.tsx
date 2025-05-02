@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Image } from
 import { useCart } from '../cartContext'
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useLocationContext } from '../locationContext';
 
 export default function Cart() {
+  const { address } = useLocationContext();
   const { cartItems, incrementItem, decrementItem, removeFromCart } = useCart();
   const router = useRouter();
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
@@ -69,7 +71,9 @@ export default function Cart() {
         onRequestClose={() => setShowDialog(false)}
       >
         <View style={styles.modalOverlay}>
+         
           <View style={styles.modalContent}>
+         
             <Text style={styles.totalAmountLabel}>Total Amount</Text>
             <Text style={styles.totalAmountValue}>₹{total}</Text>
 
@@ -82,6 +86,7 @@ export default function Cart() {
       </Modal>
 
       <View style={styles.totalContainer}>
+      <Text>{address}</Text>  
         <Text style={styles.totalText}>Total: ₹ {total}</Text>
         <TouchableOpacity style={styles.checkoutBtn} onPress={() => setShowDialog(true)}>
           <Text style={styles.checkoutText}>Checkout</Text>

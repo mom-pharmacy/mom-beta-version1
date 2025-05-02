@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import {
     View,
     Text,
@@ -24,17 +24,15 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import Categories from './categories';
-import {useLocation} from '@/hooks/useLocation';
 import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
-import { AuthContext } from '@/context/authContext';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import { useLocationContext } from '../locationContext';
+
 
 export default function Home() {
 
-    const { locationName } = useLocation();
-    const {userDetails} = useContext(AuthContext);
-    console.log('User Details from home page:', userDetails);
+    const { address } = useLocationContext();
+
     const handleUpload = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
@@ -66,12 +64,12 @@ export default function Home() {
     };
 
     const handleLocation = () => {
-        router.push('../Profile/myaddress')
+        router.push('../myaddress')
     }
 
     return (
         <>
-        <ProtectedRoute>
+
             <SafeAreaView style={styles.total}>
 
                 {showHeader && <View style={styles.main}>
@@ -80,9 +78,9 @@ export default function Home() {
                         <Text style={styles.head}>10 minutes</Text>
                         <TouchableOpacity onPress={handleLocation} >
                             <View style={styles.row}>
-                                <FontAwesome6 name="location-dot" size={24} color="white" />
+                                <FontAwesome6 name="location-dot" size={22} color="white" />
                                 <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                                    {locationName || "Fetching location..."} <Entypo style={{ marginTop: 10 }} name="chevron-down" size={24} color="white" />
+                                    {address || "Fetching location..."} <Entypo style={{ marginTop: 7 }} name="chevron-down" size={24} color="white" />
                                 </Text>
                             </View>
                         </TouchableOpacity>
@@ -117,6 +115,14 @@ export default function Home() {
                             <Text style={styles.iconText}>Pharmacy</Text>
                         </View>
                         <View style={styles.each}>
+                            <TouchableHighlight onPress={() => router.push('../BloodFinder/myProfile')}>
+                                <View>
+                                    <MaterialCommunityIcons name="blood-bag" size={25} color="white" />
+                                    <Text style={styles.iconText}>Bloodbank</Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+                        <View style={styles.each}>
                             <FontAwesome name="stethoscope" size={24} color="white" />
                             <Text style={styles.iconText}>Doctor</Text>
                         </View>
@@ -128,21 +134,7 @@ export default function Home() {
                             <FontAwesome5 name="hospital" size={25} color="white" />
                             <Text style={styles.iconText}>Hospitals</Text>
                         </View>
-                        <View style={styles.each}>
-                            <TouchableHighlight onPress={() => router.push('../BloodFinder/myProfile')}>
-                                <View>
-                                    <MaterialCommunityIcons name="blood-bag" size={25} color="white" />
-                                    <Text style={styles.iconText}>Bloodbank</Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-
-
-
                     </View>
-
-
-
                     <View style={styles.container}>
                         <TouchableHighlight
                             activeOpacity={0.6}
@@ -211,7 +203,7 @@ export default function Home() {
                     </View>
                 </ScrollView>
             </SafeAreaView>
-            </ProtectedRoute>
+
         </>
     );
 }
@@ -300,14 +292,12 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 10,
     },
-
-
-
     locationText: {
         color: 'white',
         fontSize: 16,
-        marginLeft: 3,
+        marginLeft: 2,
         flexShrink: 1,
+        marginBottom:10
     },
 
     cartContainer: {

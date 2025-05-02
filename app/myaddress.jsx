@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -15,6 +15,8 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const MyAddressesScreen = () => {
+  const [data, setData] = useState([]);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState('Rohith, 13-55, beside HP petrol bunk, Yadav Nagar, Malkajgiri, Secunderabad');
   const [customAddress, setCustomAddress] = useState(selectedAddress);
@@ -29,9 +31,7 @@ const MyAddressesScreen = () => {
     setModalVisible(false);
   };
 
-  // const handleLocation=() =>{
-  //   router.replace('./addAddress');
-  // };
+
   const handleWhatsAppClick = () => {
     const message = "Please share your delivery location to ensure a hassle-free delivery by clicking on this link";
     const url = `whatsapp://send?text=${encodeURIComponent(message)}`;
@@ -62,6 +62,31 @@ const MyAddressesScreen = () => {
     }
   };
 
+
+
+  useEffect(() => {
+      getData();
+    }, []);
+  
+    const getData = async () => {
+      try {
+        console.log("error")
+        const response = await fetch("https://mom-beta-server.onrender.com/address/alladdress");
+        
+        const res = await response.json();
+        console.log("jashoww", res);
+  
+        if (Array.isArray(res)) {
+          setData(res);
+        } else if (res.data) {
+          setData([res.data]);
+        } else {
+          setData([]);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
   return (
     <ScrollView style={styles.container}>
       {/* Add Address */}
@@ -83,23 +108,36 @@ const MyAddressesScreen = () => {
       <Text style={styles.sectionTitle}>Your saved addresses</Text>
 
       {/* Address Card */}
-      <View style={styles.addressCard}>
-        <View style={styles.addressHeader}>
-          <View style={styles.homeIconBackground}>
-            <Icon name="home" size={20} color="#f0ad4e" />
-          </View>
-          <Text style={styles.addressTitle}>Home</Text>
-        </View>
-        <Text style={styles.addressDetails}>{selectedAddress}</Text>
-        <View style={styles.addressActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={() => setModalVisible(true)}>
-            <Icon name="ellipsis-h" size={20} color="gray" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handleShareAddress}>
-            <Icon name="upload" size={20} color="gray" />
-          </TouchableOpacity>
-        </View>
+      {data.map((item, index) => (
+       
+  <View key={index} style={styles.addressCard}>
+    <View style={styles.addressHeader}>
+      <View style={styles.homeIconBackground}>
+        <Icon name="home" size={20} color="#f0ad4e" />
       </View>
+     
+      <Text style={styles.addressTitle}>{item.name || "Saved Address"}</Text>
+    </View>
+    <Text style={styles.addressDetails}>
+      {item.name}, {item.houseNo}, {item.buildingName}, {item.street}, {item.city}, {item.state}, {item.pincode}
+    </Text>
+    <View style={styles.addressActions}>
+      <TouchableOpacity style={styles.actionButton} onPress={() => {
+        setCustomAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
+        setSelectedAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
+        setModalVisible(true);
+      }}>
+        <Icon name="ellipsis-h" size={20} color="gray" />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.actionButton} onPress={() => {
+        Share.share({ message: `Address: ${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}` });
+      }}>
+        <Icon name="upload" size={20} color="gray" />
+      </TouchableOpacity>
+    </View>
+  </View>
+))}
+
 
       {/* Modal */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>

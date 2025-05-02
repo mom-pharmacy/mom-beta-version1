@@ -3,16 +3,25 @@ import { View, TextInput, TouchableOpacity, Text, TouchableHighlight } from 'rea
 import * as Contacts from 'expo-contacts';
 import { AntDesign } from '@expo/vector-icons';
 
+import { useLocalSearchParams } from 'expo-router';
+
 export default function AddressForm() {
-  const [contactName, setContactName] = useState("");
+  const { address } = useLocalSearchParams();
+
+    const [contactName, setContactName] = useState("");
   const [contact, setContact] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [buildingBlockNumber, setBuildingBlockNumber] = useState("");
 
-  const [streetName, setStreetName] = useState("");
-  const [city, setCity] = useState("");
-  const [stateName, setStateName] = useState("");
-  const [pincode, setPincode] = useState("");
+
+  const addressParts = (address as string)?.split(',') || [];
+
+const street = addressParts.slice(0, 2).join(',').trim(); 
+const city = addressParts[2]?.trim() || '';
+const region = addressParts[3]?.trim() || '';
+const country = addressParts[4]?.trim() || '';
+const pincode = parseInt(addressParts[5]?.trim() || '0');
+
 
   // Pick contact from phone
   const pickContact = async () => {
@@ -31,56 +40,46 @@ export default function AddressForm() {
     }
   };
 
-  // Handle selected address text
-  const handleSelectedAddress = (addressString) => {
-    const parts = addressString.split(",").map(part => part.trim());
-
-    if (parts.length >= 5) {
-      setStreetName(parts[2] || ""); 
-      setCity(parts[3] || "");
-      setStateName(parts[4].split(" ")[0] || "");
-      setPincode(parts[4].split(" ")[1] || "");
-    }
-  };
-
   // Save address to server
   const handleLocation = async () => {
     try {
-      console.log("Starting API call...");
-  
-      const url = "http://192.168.1.8:3000/address/add-address"; ; // <-- Correct this!!
-  
+     
+
+      const url = "https://mom-beta-server.onrender.com/address/add-address";
+
       const bodyData = {
         userid: 12345,
-        state: stateName,
+        state: region,
         city: city,
-        street: streetName,
-        pincode: parseInt(pincode),
+        street: street,
+        
         houseNo: houseNumber,
         buildingName: buildingBlockNumber,
         name: contactName,
         contact: contact,
       };
-  
+
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
-  
+
       console.log("Response received");
-  
+
       const result = await response.json();
       console.log(result);
-  
-      if (result) {
+
+      if (response.ok) {
         console.warn("Address Added Successfully!");
+      } else {
+        console.warn("Failed to add address:", result.message || "Unknown error");
       }
     } catch (error) {
       console.error("Error in posting address:", error);
     }
   };
-  
+
   return (
     <View style={{ padding: 20 }}>
       
@@ -131,51 +130,10 @@ export default function AddressForm() {
         editable={false}
       />
 
-      {/* Street Name (auto-filled) */}
-      <TextInput
-        placeholder="Street Name"
-        value={streetName}
-        style={styles.input}
-        editable={false}
-      />
-
-      {/* City (auto-filled) */}
-      <TextInput
-        placeholder="City"
-        value={city}
-        style={styles.input}
-        editable={false}
-      />
-
-      {/* State (auto-filled) */}
-      <TextInput
-        placeholder="State"
-        value={stateName}
-        style={styles.input}
-        editable={false}
-      />
-
-      {/* Pincode (auto-filled) */}
-      <TextInput
-        placeholder="Pincode"
-        value={pincode}
-        style={styles.input}
-        editable={false}
-      />
-
       {/* Save Address Button */}
       <TouchableOpacity style={styles.button} onPress={handleLocation}>
         <Text style={styles.buttonText}>Save Address</Text>
       </TouchableOpacity>
-
-      {/* TEST BUTTON TO FILL ADDRESS MANUALLY FOR NOW */}
-      <TouchableOpacity
-        style={[styles.button, { marginTop: 10, backgroundColor: "#2196F3" }]}
-        onPress={() => handleSelectedAddress("5th Floor, Block A, Gachibowli, Hyderabad, Telangana 500032, India")}
-      >
-        <Text style={styles.buttonText}>Auto-Fill Address (Demo)</Text>
-      </TouchableOpacity>
-
     </View>
   );
 }
