@@ -19,7 +19,7 @@ export default function Index() {
 
     <Text style={styles.tagline}>Beyond pills - We deliver Life in Minutes</Text>
 
-    <TouchableOpacity style={styles.button} onPress={()=>router.replace("/Home/home")}>
+    <TouchableOpacity style={styles.button} onPress={()=>router.replace("/myProfile")}>
       <Text style={styles.buttonText}>Get Started</Text>
     </TouchableOpacity>
    
