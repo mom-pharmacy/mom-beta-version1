@@ -1,0 +1,1 @@
+export const BASE_URL = 'http://192.168.233.22:3000/api/donar/'; 
