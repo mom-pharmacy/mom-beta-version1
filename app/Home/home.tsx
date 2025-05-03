@@ -29,10 +29,11 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
 import { AuthContext } from '@/context/authContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { useLocationContext } from '../locationContext';
 
 export default function Home() {
 
-    const { locationName } = useLocation();
+    const { address } = useLocationContext();
     const {userDetails} = useContext(AuthContext);
     console.log('User Details from home page:', userDetails);
     const handleUpload = async () => {
@@ -82,7 +83,7 @@ export default function Home() {
                             <View style={styles.row}>
                                 <FontAwesome6 name="location-dot" size={24} color="white" />
                                 <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                                    {locationName || "Fetching location..."} <Entypo style={{ marginTop: 10 }} name="chevron-down" size={24} color="white" />
+                                    {address || "Fetching location..."} <Entypo style={{ marginTop: 10 }} name="chevron-down" size={24} color="white" />
                                 </Text>
                             </View>
                         </TouchableOpacity>
