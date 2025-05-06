@@ -27,6 +27,7 @@ import Categories from './categories';
 import Entypo from '@expo/vector-icons/Entypo';
 import { router } from 'expo-router';
 import { useLocationContext } from '../locationContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 
 export default function Home() {
@@ -68,7 +69,7 @@ export default function Home() {
     }
 
     return (
-        <>
+        <ProtectedRoute>
 
             <SafeAreaView style={styles.total}>
 
@@ -204,7 +205,7 @@ export default function Home() {
                 </ScrollView>
             </SafeAreaView>
 
-        </>
+        </ProtectedRoute>
     );
 }
 

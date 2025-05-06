@@ -12,6 +12,8 @@ export default function Index() {
       if (isLoggedIn && storedToken) {
         // Navigate to home screen
         router.replace('/Home/home');  // or whatever your home route is
+      }else{
+        router.replace("/Login/Login")
       }
     };
 

@@ -27,9 +27,7 @@ const pincode = parseInt(addressParts[5]?.trim() || '0');
   const pickContact = async () => {
     const { status } = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
-      const pickedContact = await Contacts.presentContactPickerAsync({
-        fields: [Contacts.Fields.PhoneNumbers],
-      });
+      const pickedContact = await Contacts.presentContactPickerAsync();
 
       if (pickedContact) {
         setContactName(pickedContact.name || '');
@@ -52,7 +50,7 @@ const pincode = parseInt(addressParts[5]?.trim() || '0');
         state: region,
         city: city,
         street: street,
-        
+        pincode: pincode,
         houseNo: houseNumber,
         buildingName: buildingBlockNumber,
         name: contactName,
