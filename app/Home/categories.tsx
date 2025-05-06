@@ -8,12 +8,14 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useCart } from "../cartContext";
 import { router } from "expo-router";
 export default function Categories({ showSearch = true }) {
   const { cartItems, addToCart, removeFromCart, incrementItem, decrementItem } = useCart();
   const [data, setData] = useState<any[]>([]);
+  const [loadingCategores , setLoadingCategories] = useState(false)
 
    // Navigation hook
 
@@ -23,10 +25,11 @@ export default function Categories({ showSearch = true }) {
 
   const getData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/medicines/");
+      setLoadingCategories(true)
+      const response = await fetch("https://mom-beta-server.onrender.com/api/medicines/");
       const res = await response.json();
       console.log("jashoww", res);
-
+      setLoadingCategories(false)
       if (Array.isArray(res)) {
         setData(res);
       } else if (res.data) {
@@ -44,9 +47,15 @@ export default function Categories({ showSearch = true }) {
     return findItem ? findItem.quantity : 0;  // Return 0 if item not found
   };
 
+  const loadingScreenCat = ()=>{
+    return <View style={{flex:1 ,justifyContent:"center" , alignItems:"center"  , marginTop:40}}>
+      <ActivityIndicator size={'large'}/>
+    </View>
+  }
+
   return (
     <ScrollView style={{ marginBottom: 80, backgroundColor: 'white' }}>
-      {showSearch && (
+      {loadingCategores? loadingScreenCat() : <>{showSearch && (
         <View style={styles.search}>
           <EvilIcons name="search" size={24} color="black" style={styles.bar} />
           <TextInput placeholder="search medicines" />
@@ -74,20 +83,14 @@ export default function Categories({ showSearch = true }) {
               >
                 <View style={styles.card}>
                   <View style={styles.imageContainer}>
-                    {item.imageUrl ? (
+                     
                       <Image
-                          source={{
-                            uri: `http://localhost:3000${item.imageUrl}`  // Dynamic image URL
-                          }}
+                          source={require('@/assets/images/medicine.png')}
                           style={styles.image}
                           resizeMode="contain"
                         
                       />
-                    ) : (
-                      <View style={styles.noImageContainer}>
-                        <Text style={styles.noImageText}>No Image</Text>
-                      </View>
-                    )}
+                
 
                     {!cartItems.some((itemcart) => item._id === itemcart._id) ? (
                       <TouchableOpacity
@@ -126,7 +129,7 @@ export default function Categories({ showSearch = true }) {
             </View>
           ))}
         </View>
-      )}
+      )}</>}
     </ScrollView>
   );
 }

@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Emulator",
+        "type": "shell",
+        "command": "emulator -avd my_avd_name",
+        "problemMatcher": []
+      },
+      {
+        "label": "Run Expo on Android",
+        "type": "shell",
+        "command": "npx expo run:android",
+        "dependsOn": "Start Emulator",
+        "problemMatcher": []
+      }
+    ]
+  }
+  

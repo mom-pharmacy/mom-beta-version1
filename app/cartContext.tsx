@@ -13,14 +13,16 @@ export const CartProvider = ({ children }) => {
   },[])
 
   useEffect(()=>{
+    console.log("updating cart " , cartItems)
     AsyncStorage.setItem("carts", JSON.stringify(cartItems));
+    console.log("updated cart" , cartItems)
   } , [cartItems])
   
   const loadCartItems = async()=>{
     let carts = await AsyncStorage.getItem("carts");
     carts = carts?JSON.parse(carts):[];
     console.log("carts:", carts);
-    setCartItems(carts);
+    setCartItems(Array.isArray(carts) ? carts : []);
   }
 
   const addToCart = async (item) => {
@@ -72,13 +74,15 @@ export const CartProvider = ({ children }) => {
     AsyncStorage.setItem("carts", JSON.stringify(cartItems));
   };
 
-  const clearCart = () => {
-    setCartItems([])
+  const clearCart = async () => {
+    console.log('cart cleared');
+  await AsyncStorage.removeItem("carts"); // clear from storage
+  setCartItems([]); // clear state
   }
   
 
   return (
-    <CartContext.Provider value={{ cartItems , addToCart, removeFromCart  , incrementItem , decrementItem}}>
+    <CartContext.Provider value={{ cartItems , addToCart, removeFromCart  , incrementItem , decrementItem , clearCart}}>
       {children}
     </CartContext.Provider>
   );
