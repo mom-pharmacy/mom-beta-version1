@@ -3,24 +3,29 @@ import { View, TextInput, TouchableOpacity, Text, TouchableHighlight } from 'rea
 import * as Contacts from 'expo-contacts';
 import { AntDesign } from '@expo/vector-icons';
 
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { userAuth } from '@/context/authContext';
 
 export default function AddressForm() {
   const { address } = useLocalSearchParams();
 
-    const [contactName, setContactName] = useState("");
+  const [contactName, setContactName] = useState("");
   const [contact, setContact] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [buildingBlockNumber, setBuildingBlockNumber] = useState("");
 
+  const navigation = useNavigation()
+  const {userDetails} = userAuth()
+  console.log(userDetails._id)
+
 
   const addressParts = (address as string)?.split(',') || [];
 
-const street = addressParts.slice(0, 2).join(',').trim(); 
-const city = addressParts[2]?.trim() || '';
-const region = addressParts[3]?.trim() || '';
-const country = addressParts[4]?.trim() || '';
-const pincode = parseInt(addressParts[5]?.trim() || '0');
+  const street = addressParts.slice(0, 2).join(',').trim();
+  const city = addressParts[2]?.trim() || '';
+  const region = addressParts[3]?.trim() || '';
+  const country = addressParts[4]?.trim() || '';
+  const pincode = parseInt(addressParts[5]?.trim() || '0');
 
 
   // Pick contact from phone
@@ -41,12 +46,12 @@ const pincode = parseInt(addressParts[5]?.trim() || '0');
   // Save address to server
   const handleLocation = async () => {
     try {
-     
+
 
       const url = "https://mom-beta-server.onrender.com/address/add-address";
 
       const bodyData = {
-        userid: 12345,
+        userid: userDetails._id,
         state: region,
         city: city,
         street: street,
@@ -70,6 +75,7 @@ const pincode = parseInt(addressParts[5]?.trim() || '0');
 
       if (response.ok) {
         console.warn("Address Added Successfully!");
+        navigation.goBack()
       } else {
         console.warn("Failed to add address:", result.message || "Unknown error");
       }
@@ -80,7 +86,7 @@ const pincode = parseInt(addressParts[5]?.trim() || '0');
 
   return (
     <View style={{ padding: 20 }}>
-      
+
       {/* House Number */}
       <TextInput
         placeholder="House No."

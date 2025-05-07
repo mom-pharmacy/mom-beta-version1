@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, Image, StatusBar, ActivityIndicator } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import MedicineCard from '@/components/MedicineCard'
+import { userAuth } from '@/context/authContext'
 
 const medicineData = [
     {
@@ -31,6 +32,28 @@ const medicineData = [
 ]
 
 export default function OrderConfirmation() {
+
+    // const {ExtractParseToken} = userAuth()
+    // const authToken = await ExtractParseToken()
+
+
+    // useEffect(()=>{
+    //     const ActiveOrderDetails = async ()=>{
+    //         try{
+    //             const options = {
+    //                 headers:{
+    //                     "Authorization":`Bearer ${authToken}`,
+    //                     "Content-Type":"application/json"
+    //                 }
+    //             }
+    //             const response = await fetch(`https://mom-beta-server1.onrender.com/api/orderbyid/${} `)
+    //         }catch(e){
+    //             console.log("Error in getting order details" , e)
+    //         }
+    //     }
+    // } , [])
+
+
     return (
         <>
             <View style={styles.mainContainer}>

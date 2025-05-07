@@ -14,6 +14,7 @@ import { useCart } from '../cartContext';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userAuth } from '@/context/authContext';
 
 export default function Cart() {
   const { cartItems, incrementItem, decrementItem, removeFromCart  , clearCart} = useCart();
@@ -21,6 +22,9 @@ export default function Cart() {
   const [showDialog, setShowDialog] = useState(false);
 
   const BASE_URL = 'http://localhost:3000';
+
+  const {ExtractParseToken} = userAuth()
+
 
   // Totals
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -46,10 +50,12 @@ export default function Cart() {
 
 
   async function postOrders(medicines){
+    const tokenAuth = await ExtractParseToken()
     const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization":`Bearer ${tokenAuth}`
       },
       body: JSON.stringify({
         user_id: "664420f6932c5c9c702a40c3",

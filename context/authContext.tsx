@@ -154,6 +154,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const ExtractParseToken = async ()=>{
+    const token = await AsyncStorage.getItem("user")
+    const parsedToken = JSON.parse(token)
+    return parsedToken
+    }
+
   return (
     <AuthContext.Provider value={{
       loginWithOtp,
@@ -164,7 +170,8 @@ export const AuthProvider = ({ children }) => {
       userDetails,
       isRegistrationComplete,
       getUserDetails,
-      postData
+      postData , 
+      ExtractParseToken
     }}>
       {loading ? <LoadingScreen /> : children}
     </AuthContext.Provider>
